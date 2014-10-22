@@ -23,12 +23,13 @@ initA() ->
 
 %% array × pos × elem → array
 setA(Array, Pos, Elem) ->
+  % TODO: 
   % Prüfen ob an dieser Stelle bereits ein Element existiert
-  Elem = getA(Array, Pos),
+  Obj = getA(Array, Pos),
 
   if
     % Falls kein Element an dieser Stelle besteht erhalten wir eine 0 zurück
-    Elem == 0 ->
+    Obj == 0 ->
       % Element einfügen
       liste:insert(Array, Pos + 1, Elem);
     true ->
