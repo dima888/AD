@@ -34,7 +34,8 @@ front([InStack, OutStack]) ->
               todo;
 
             true -> % Der Instack ist nicht leer, also Element umverlagern in den Outstack
-                    todo
+                    [NewInStack, NewOutStack] = shiftFromInStackToOutStack([InStack, OutStack]),
+                    stack:top(NewOutStack)
         end;
 
       true -> % Der Outstack ist nicht leer also oberstes (älteste durch Umverlagerung) Element zurück geben
@@ -58,5 +59,40 @@ isEmpty([InStack, OutStack]) ->
 %                                                       HILFS FUNKTIONEN
 %=================================================================================================================================================
 
-shiftFromInStackToOutStack(InStack, OutStack) ->
-  notImplementedYet.
+%% Verlagert die Elemente vom Instack um in den Outstack
+shiftFromInStackToOutStack([InStack, OutStack]) ->
+  % Rekursive Methode für das Umverlagern, der letzte Parameter ist die Abbruchbedingung
+  shiftFromInStackToOutStackR(InStack, OutStack, false).
+
+shiftFromInStackToOutStackR(InStack, OutStack, true) ->
+  % Modifizierte Queue zurück geben
+  [InStack, OutStack];
+shiftFromInStackToOutStackR(InStack, OutStack, false) ->
+  %io:format("***Anfang*** InStack: ~p~n", [InStack]),
+  %io:format("***Anfang*** OutStack: ~p~n", [OutStack]),
+
+  % Ergebnis der Abfrage abspeichern
+  IsInStackEmpty = stack:isEmptyS(InStack),
+
+  if  % Falls der Instack leer ist, wurden alle Elemente umverlagert und der Durchlauf soll beendet werden
+      IsInStackEmpty == true ->
+        % Rekursion abbrechen -> signalisiert durch das true
+        shiftFromInStackToOutStackR(InStack, OutStack, true);
+
+      % Der Stack ist nicht leer, also oberstes Element aus Instack umverlagern und rekursiv aufrufen
+      true ->
+        % Oberstes Element abspeichern
+        TopElementOfInStack = stack:top(InStack),
+
+        % OutStack mit hinzugefügtem Element
+        NewOutStack = stack:push(OutStack, TopElementOfInStack),
+
+        % Umverlagertes Element entfernen
+        NewInStack = stack:pop(InStack),
+
+        %io:format("***Ende*** NewInStack: ~p~n", [NewInStack]),
+        %io:format("***Ende*** NewOutStack: ~p~n", [NewOutStack]),
+
+        % Das oberste Element vom Instack löschen und dem Outstack hinzufügen und weiter Umverlagern
+        shiftFromInStackToOutStackR(NewInStack, NewOutStack, false)
+  end.
