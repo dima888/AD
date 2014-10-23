@@ -56,7 +56,7 @@ insert(List, Pos, Elem) ->
       modifyIndices(concat(List, [ [Pos, Elem, undefined] ] ));
   true ->
 
-   % PRECONDION, FALLS DIE POSITION NICHT LEGETIM IST
+   % PRECONDION, FALLS DIE POSITION NICHT LEGITIM IST
     if ( (Pos > LastIndex) or (Pos < 1) ) ->
       List;
     true ->
@@ -129,6 +129,7 @@ insertHelperbefore(Head, Tail, Pos, Buffer, Counter) ->
     end
   end.
 
+%% weiß nicht mehr :D
 insertHelperAfter(Head, Tail, Pos, Buffer, Counter) ->
   if (Tail == []) ->
     concat(Buffer, [Head]);
@@ -159,13 +160,13 @@ getLastIndex(_, Tail, Counter) ->
   [SecondElem | Rest] = Tail,
   getLastIndex(SecondElem, Rest, Counter + 1).
 
-% Diese Funktion fuegt zwei Liste zusammen
+%% Diese Funktion fuegt zwei Liste zusammen
 concatHelper([], List2) ->
   List2;
 concatHelper([H | T], List2) ->
   [ H | concatHelper(T, List2) ].
 
-%Lieft den Index zur einem Element zurueck
+%% Lieft den Index zur einem Element zurueck
 findHelper(List, Elem) ->
   [Head | Tail] = List,
   findHelper(Head, Tail, Elem).
@@ -186,7 +187,7 @@ findHelper(Head, Tail, Elem) ->
     findHelper(SecondElem, Rest, Elem)
   end.
 
-%% Diese Funktion errechnet die Indeces neu
+%% Diese Funktion errechnet die Indices neu
 modifyIndices([]) -> [];
 modifyIndices(List) ->
   [Head | Tail] = List,
@@ -201,7 +202,7 @@ mofifyIndices(Head, Tail, Counter, Result) ->
   [SecondHead | Rest] = Tail,
   mofifyIndices(SecondHead, Rest, Counter + 1, concat(Result, [ [Counter, Element, Counter + 1] ])).
 
-% Entfernt ein Element von einer bestimmten Position in einer Liste
+%% Entfernt ein Element von einer bestimmten Position in einer Liste
 deleteHelper(List, Pos) ->
   [Head | Tail] = List,
   deleteHelper(Head, Tail, Pos, []).
@@ -222,6 +223,7 @@ deleteHelper(Head, Tail, Pos, Result) ->
   end.
 
 %% Diese Funktion findet ein Element zur einer Position
+retrieveHelper([], Pos) -> todo;
 retrieveHelper(List, Pos) ->
   [Head | Tail] = List,
   retrieveHelper(Head, Tail, Pos).
