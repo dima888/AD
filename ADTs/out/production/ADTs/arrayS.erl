@@ -59,7 +59,7 @@ getA(Array, Pos) ->
   if  % Prüfen ob negative Pos übergeben wurde
       Pos < 0 ->
         % TODO: Zu klären was in diesem Fall zurück gegeben werden muss (SKIZZE)
-        0;
+        todo;
       true ->  ArrayLengthGreaterThanPos = lengthA(Array) > Pos,
                if
                   ArrayLengthGreaterThanPos == true ->

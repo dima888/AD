@@ -33,9 +33,10 @@ front([InStack, OutStack]) ->
               % TODO: Zu klären was in diesem Fall zurück gegeben werden soll
               todo;
 
-            true -> % Der Instack ist nicht leer, also Element umverlagern in den Outstack
-                    [NewInStack, NewOutStack] = shiftFromInStackToOutStack([InStack, OutStack]),
-                    stack:top(NewOutStack)
+            % Der Instack ist nicht leer, also Element umverlagern in den Outstack
+            true ->
+              [NewInStack, NewOutStack] = shiftFromInStackToOutStack([InStack, OutStack]),
+              stack:top(NewOutStack)
         end;
 
       true -> % Der Outstack ist nicht leer also oberstes (älteste durch Umverlagerung) Element zurück geben
@@ -48,7 +49,33 @@ enqueue([InStack, OutStack], Elem) ->
 
 %% queue -> queue
 dequeue([InStack, OutStack]) ->
-  notImplementedYet.
+  % Ergebnis der Abfrage speichern
+  IsOutStackEmpty = stack:isEmptyS(OutStack),
+
+  if  % Prüfen ob der Outstack leer ist
+      IsOutStackEmpty == true ->
+
+        % Ergebnis der Abfrage speichern
+        IsInStackEmpty = stack:isEmptyS(InStack),
+
+        if  % Prüfen ob der Instack ebenfalls leer ist
+            IsInStackEmpty == true ->
+
+              % Beide Stacks sind leer, nicht modifizierte (leere Queue) zurück geben
+              [InStack, OutStack];
+
+            % Falls der Instack nicht leer ist, muss umsortiert werden
+            true ->
+              [NewInStack, NewOutStack] = shiftFromInStackToOutStack([InStack, OutStack]),
+
+              % Oberstes Element entfernen und Queue zurück geben
+              [NewInStack, stack:pop(NewOutStack)]
+        end;
+
+      % Falls der Outstack nicht leer ist, oberstes Element entfernen
+      true ->
+        [InStack, stack:pop(OutStack)]
+  end.
 
 %% queue -> bool
 isEmpty([InStack, OutStack]) ->
