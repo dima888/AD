@@ -187,6 +187,7 @@ findHelper(Head, Tail, Elem) ->
   end.
 
 %% Diese Funktion errechnet die Indeces neu
+modifyIndices([]) -> [];
 modifyIndices(List) ->
   [Head | Tail] = List,
   mofifyIndices(Head, Tail, 1, []).

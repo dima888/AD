@@ -68,8 +68,8 @@ shiftFromInStackToOutStackR(InStack, OutStack, true) ->
   % Modifizierte Queue zurück geben
   [InStack, OutStack];
 shiftFromInStackToOutStackR(InStack, OutStack, false) ->
-  io:format("***Anfang*** InStack: ~p~n", [InStack]),
-  io:format("***Anfang*** OutStack: ~p~n", [OutStack]),
+  %io:format("***Anfang*** InStack: ~p~n", [InStack]),
+  %io:format("***Anfang*** OutStack: ~p~n", [OutStack]),
 
   % Ergebnis der Abfrage abspeichern
   IsInStackEmpty = stack:isEmptyS(InStack),
@@ -90,8 +90,8 @@ shiftFromInStackToOutStackR(InStack, OutStack, false) ->
         % Umverlagertes Element entfernen
         NewInStack = stack:pop(InStack),
 
-        io:format("***Ende*** NewInStack: ~p~n", [NewInStack]),
-        io:format("***Ende*** NewOutStack: ~p~n", [NewOutStack]),
+        %io:format("***Ende*** NewInStack: ~p~n", [NewInStack]),
+        %io:format("***Ende*** NewOutStack: ~p~n", [NewOutStack]),
 
         % Das oberste Element vom Instack löschen und dem Outstack hinzufügen und weiter Umverlagern
         shiftFromInStackToOutStackR(NewInStack, NewOutStack, false)
