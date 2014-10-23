@@ -86,8 +86,7 @@ getA(Array, Pos) ->
 
 %% array → pos
 lengthA(Array) ->
-  % Position anpassen, da Liste an Pos 1 beginnt und Array an Pos 0
-  liste:laenge(Array) - 1.
+  liste:laenge(Array).
 
 %=================================================================================================================================================
 %                                                       HILFS FUNKTIONEN
@@ -95,16 +94,16 @@ lengthA(Array) ->
 
 %% Befüllt das übergebene Array mit Nullen bis zur übergebenen Position
 fillUpArray(Array, Pos) ->
-  io:format("Arrayinhalt: ~p~n", [Array]),
-  io:format("Position an der eingefügt werden soll: ~p~n", [Pos]),
+  %io:format("Arrayinhalt: ~p~n", [Array]),
+  %io:format("Position an der eingefügt werden soll: ~p~n", [Pos]),
 
   % Aktuelle Arraylänge ermitteln
   CurrentLength = liste:laenge(Array),
-  io:format("Arraylänge: ~p~n", [liste:laenge(Array)]),
+  %io:format("Arraylänge: ~p~n", [liste:laenge(Array)]),
 
   % Anzahl einzufügender Nullen berechnen
   FillUpCounter = (Pos - 1) - CurrentLength,
-  io:format("FillUpCounter: ~p~n", [FillUpCounter]),
+  %io:format("FillUpCounter: ~p~n", [FillUpCounter]),
 
   % Nullen auffüllen
   fillUpArrayR(Array, FillUpCounter).

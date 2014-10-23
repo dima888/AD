@@ -39,18 +39,20 @@ setA(Array, Pos, Elem) ->
         % Ergenis der Abfrage speichern, ob die übergebene Pos größer ist als die Länge des übergebenen Arrays
         IsPosGreaterThanArrayLength = AdjustedPos > lengthA(Array),
 
-        if
-          IsPosGreaterThanArrayLength == true ->
-            % Array mit Nullen befüllen bis Position - 1 erreicht ist um übergebenes Element einzufügen
-            FilledArray = fillUpArray(Array, AdjustedPos),
-            liste:insert(FilledArray, AdjustedPos, Elem);
+        if  % Prüfen ob Pos größer ist als Arraylänge
+            IsPosGreaterThanArrayLength == true ->
 
-          true -> % Falls die übergebene Position nicht größer ist als die Länge des übergebenen Arrays
-            % Bestehendes Element löschen
-            ModifiedArray = liste:delete(Array, AdjustedPos),
+              % Array mit Nullen befüllen bis Position - 1 erreicht ist um übergebenes Element einzufügen
+              FilledArray = fillUpArray(Array, AdjustedPos),
+              liste:insert(FilledArray, AdjustedPos, Elem);
 
-            % Neues Elementeinfügen
-            liste:insert(ModifiedArray, AdjustedPos, Elem)
+            % Falls Arraylänge größer oder gleich Pos ist
+            true ->
+              % Bestehendes Element löschen
+              ModifiedArray = liste:delete(Array, AdjustedPos),
+
+              % Neues Elementeinfügen
+              liste:insert(ModifiedArray, AdjustedPos, Elem)
         end
   end.
 
@@ -60,15 +62,26 @@ getA(Array, Pos) ->
       Pos < 0 ->
         % TODO: Zu klären was in diesem Fall zurück gegeben werden muss (SKIZZE)
         todo;
-      true ->  ArrayLengthGreaterThanPos = lengthA(Array) > Pos,
-               if
-                  ArrayLengthGreaterThanPos == true ->
-                    % Element zurückgeben
-                    liste:retrieve(Array, Pos);
-                  true ->
-                    % 0 für nicht beschriebene Position zurück geben, da Pos größer als Arraylength
-                    0
-               end
+
+      % Falls Pos >= 0 ist
+      true ->
+        % Position anpassen, da Liste an Pos 1 beginnt und Array an Pos 0
+        AdjustedPos = Pos + 1,
+
+        % Ergebnis der Abfrage abspeichern
+        ArrayLengthGreaterThanOrEqualPos = lengthA(Array) >= AdjustedPos,
+
+        if  % Prüfen ob die Arraylänge größer oder gleich Pos ist
+            ArrayLengthGreaterThanOrEqualPos == true ->
+
+              % Element zurückgeben
+              liste:retrieve(Array, AdjustedPos);
+
+            % Falls
+            true ->
+              % 0 für nicht beschriebene Position zurück geben, da Pos größer als Arraylength
+              0
+         end
   end.
 
 %% array → pos
@@ -81,16 +94,16 @@ lengthA(Array) ->
 
 %% Befüllt das übergebene Array mit Nullen bis zur übergebenen Position
 fillUpArray(Array, Pos) ->
-  io:format("Arrayinhalt: ~p~n", [Array]),
-  io:format("Position an der eingefügt werden soll: ~p~n", [Pos]),
+  %io:format("Arrayinhalt: ~p~n", [Array]),
+  %io:format("Position an der eingefügt werden soll: ~p~n", [Pos]),
 
   % Aktuelle Arraylänge ermitteln
   CurrentLength = liste:laenge(Array),
-  io:format("Arraylänge: ~p~n", [liste:laenge(Array)]),
+  %io:format("Arraylänge: ~p~n", [liste:laenge(Array)]),
 
   % Anzahl einzufügender Nullen berechnen
   FillUpCounter = (Pos - 1) - CurrentLength,
-  io:format("FillUpCounter: ~p~n", [FillUpCounter]),
+  %io:format("FillUpCounter: ~p~n", [FillUpCounter]),
 
   % Nullen auffüllen
   fillUpArrayR(Array, FillUpCounter).
