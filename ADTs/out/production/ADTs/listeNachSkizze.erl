@@ -2,7 +2,7 @@
 %                                              Vorgegebene Schnittstellen der ADT
 %=================================================================================================================================================
 
--module(liste).
+-module(listeNachSkizze).
 
 %% API
 -export([create/0, isEmpty/1, laenge/1, insert/3, delete/2, find/2, retrieve/2, concat/2]).
@@ -41,12 +41,9 @@ laenge({liste, Elems}) ->
 % der Aus- gangsliste angefügt. Falls sich der Index der Position, an dem das Element eingefügt werden 
 % sollte, außerhalb der Länge der Liste befindet, wird das Element einfach an das Ende der Liste angefügt.
 % ***************************************** NACH SKIZZE *****************************************************
-insert({liste, {}}, Pos, Elem) ->
-  % Liste ist leer, unmodifiziert zurückgeben
-  {liste, {}};
 insert({liste, Elems}, Pos, Elem) ->
   % Element hinzufügen
-  {liste, insertElem(Elems, Elem, Pos, CurrentPos, {})}.
+  {liste, insertElem(Elems, Elem, Pos, 1, [], false)}.
 
 %% list × pos → list
 % ***************************************** NACH SKIZZE *****************************************************
@@ -54,8 +51,8 @@ insert({liste, Elems}, Pos, Elem) ->
 % Elements, wird das Element am gewünschten Index ausgelassen und einfach übergangen. Danach läuft das 
 % anfügen der Elemente normal weiter.
 % ***************************************** NACH SKIZZE *****************************************************
-delete(List, Pos) ->
-  notImplementedYet.
+delete({liste, Elems}, Pos) ->
+  {liste, deleteElem(Elems, Pos, 1, [])}.
 
 %% list × elem → pos
 % ***************************************** NACH SKIZZE *****************************************************
@@ -63,7 +60,7 @@ delete(List, Pos) ->
 % entspricht. Zurückgegeben wird die Anzahl notwendiger Iterationsschritte, um das Element zu fin- den, 
 % die der Position des Elements in der Liste entspricht.
 % ***************************************** NACH SKIZZE *****************************************************
-find(List, Elem) ->
+find({liste, Elems}, Elem) ->
   notImplementedYet.
 
 %% list × pos → elem
@@ -72,7 +69,7 @@ find(List, Elem) ->
 % der Anzahl Iterationsschritten, die notwendig sind, um zur gewünschten Stelle in der Liste zu gelangen, 
 % von der man das Element zurückgibt.
 % ***************************************** NACH SKIZZE *****************************************************
-retrieve(List, Pos) ->
+retrieve({liste, Elems}, Pos) ->
   notImplementedYet.
 
 %% list × list → list
@@ -87,24 +84,65 @@ concat(List1, List2) ->
 %                                                       HILFS FUNKTIONEN
 %=================================================================================================================================================
 
-%% Ermittelt Rekursiv die Länge der übergebenen Liste
-% ************ Durch Skizze festgelegt: Liste durchlaufen bis leere Subliste erreicht *************
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Durch Skizze festgelegt: Liste durchlaufen bis leere Subliste erreicht
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Berechnet die Länge der übergebenen Liste
+%% @param Liste - Die Liste dessen länge bestimmt werden soll
+%% @param Counter - Zähler für die Listenelemente
 calculateLength({}, Counter) ->
   Counter;
-calculateLength({First, Second}, Counter) ->
+calculateLength({_First, Second}, Counter) ->
   calculateLength(Second, Counter + 1).
 
-%% Fügt der übergebenen Liste das übergebene Element an der übergebenen Pos zu
-% ************ Abbruchbedingung laut Skizze: Subliste leer => {} *************
-insertElem({}, Elem, Pos, CurrentPos, Result) ->
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Abbruchbedingung laut Skizze: Subliste leer => {}
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Zum einfügen eines Elementes in der Liste
+%% @param Liste - Die Liste in welche eingefügt werden soll
+%% @param Elem - Das Element, welches eingefügt werden soll
+%% @param Pos - Die Position an welche das Element eingefügt werden soll
+%% @param CurrentPos - Aktuelle Anzahl der Rekursionen
+%% @param Result - Die Resultliste
+%% @param Flag - Ein Flag zum symbolisieren ob das Element an Pos eingefügt wurde
+insertElem({}, Elem, _Pos, _CurrentPos, Result, Flag) ->
+  % Prüfen ob Element schon eingefügt wurde oder nicht
+  if
+    Flag == true -> createStructure(Result);
+    true -> createStructure(Result ++ [Elem])
+  end;
+
+insertElem({First, Second}, Elem, Pos, CurrentPos, Result, _Flag) when Pos == CurrentPos ->
+  insertElem(Second, Elem, Pos, CurrentPos + 1, Result ++ [Elem] ++ [First], true);
+
+insertElem({First, Second}, Elem, Pos, CurrentPos, Result, _Flag) ->
+  insertElem(Second, Elem, Pos, CurrentPos + 1, Result ++ [First], _Flag).
+
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Abbruchbedingung laut Skizze: Subliste leer => {}
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Zum einfügen eines Elementes in der Liste
+%% @param Liste - Die Liste in welche eingefügt werden soll
+%% @param Elem - Das Element, welches eingefügt werden soll
+%% @param Pos - Die Position an welche das Element eingefügt werden soll
+%% @param CurrentPos - Aktuelle Anzahl der Rekursionen
+%% @param Result - Die Resultliste
+%% @param Flag - Ein Flag zum symbolisieren ob das Element an Pos eingefügt wurde
+deleteElem({}, _Pos, _CurrentPos, Result) ->
+  createStructure(Result);
+
+deleteElem({_First, Second}, Pos, CurrentPos, Result) when Pos == CurrentPos ->
+  deleteElem(Second, Pos, CurrentPos + 1, Result);
+
+deleteElem({First, Second}, Pos, CurrentPos, Result) ->
+  deleteElem(Second, Pos, CurrentPos + 1, Result ++ [First]).
+
+%% Erezugt aus einer platten Liste (1-Dimensional) die geforderte Struktur
+%% @param ResultList - Die Liste mit den enthaltenen Elementen
+createStructure(ResultList) ->
+  createStructure(lists:reverse(ResultList), {}).
+
+createStructure([], Result) ->
   Result;
-insertElem({First, Second}, Elem, Pos, CurrentPos, Result) when Pos == CurrentPos ->
-  % TODO: Irgendwie Elemente hinzufügen
-  ElemAdded = append_element(Result, Elem),
-  insertElem(Second, Elem, Pos, CurrentPos, append_element(ElemAdded, {}));  
-insertElem({First, Second}, Elem, Pos, CurrentPos, Result) ->
-  insertElem(Second, Elem, Pos, CurrentPos + 1, append_element(Result, {First, {}})).  
-  
-
-
-
+createStructure([H|T], Result) ->
+  createStructure(T, {H, Result}).
