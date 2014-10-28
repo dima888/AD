@@ -113,6 +113,9 @@ insertElem({}, Elem, _Pos, _CurrentPos, Result, Flag) ->
   end;
 
 insertElem({First, Second}, Elem, Pos, CurrentPos, Result, _Flag) when Pos == CurrentPos ->
+%% ***************************************** NACH SKIZZE *****************************************************
+%% "Zuerst das einzufügende Element und anschließend das aktuelle Element der Ausgangsliste an die Ergebnisliste gehängt"
+%% ***************************************** NACH SKIZZE *****************************************************
   insertElem(Second, Elem, Pos, CurrentPos + 1, Result ++ [Elem] ++ [First], true);
 
 insertElem({First, Second}, Elem, Pos, CurrentPos, Result, _Flag) ->
@@ -132,6 +135,9 @@ deleteElem({}, _Pos, _CurrentPos, Result) ->
   createStructure(Result);
 
 deleteElem({_First, Second}, Pos, CurrentPos, Result) when Pos == CurrentPos ->
+%% ***************************************** NACH SKIZZE *****************************************************
+%%  das Element am gewünschten Index ausgelassen und einfach übergangen
+%% ***************************************** NACH SKIZZE *****************************************************
   deleteElem(Second, Pos, CurrentPos + 1, Result);
 
 deleteElem({First, Second}, Pos, CurrentPos, Result) ->
