@@ -14,8 +14,43 @@
 -author("foxhound").
 
 %% API
--export([start/0]).
+-export([numberGenerator/4]).
 
-start() ->
+%% Diese Funktion generiert Zufallszahlen
+%% @param Integer Number - Anzahl wie viele Zahlen generiert werden soll
+%% @param Integer From - Kleinste Zahl die vorkommen kann
+%% @param Integer Till - groesste Zahl die vorkommen kann
+%% @param String Path - Pfad der Datei, die befuellt werden soll mit generierten Zufallszahlen
+numberGenerator(Number, From, Till, Path) ->
 
-  util:randomliste(10, 5, 10).
+  if (Path == nil) ->
+    NewPath = "logFiles/sort1/zahlen.dat";
+  true ->
+    NewPath = Path
+  end,
+  % Zwei mal, weil bei ersten mal sehr kommische ausgeben herauskommen
+  myIO:writeInNewFile(NewPath, numberGeneratorHelper(Number, From, Till, 1, [])),
+  myIO:writeInNewFile(NewPath, numberGeneratorHelper(Number, From, Till, 1, [])).
+
+
+%% @param Integer Number - Anzahl wie viele Zahlen generiert werden soll
+%% @param Integer From - Kleinste Zahl die vorkommen kann
+%% @param Integer Till - groesste Zahl die vorkommen kann
+worstCaseLR(Number, From, Till) ->
+  todo.
+
+%% @param Integer Number - Anzahl wie viele Zahlen generiert werden soll
+%% @param Integer From - Kleinste Zahl die vorkommen kann
+%% @param Integer Till - groesste Zahl die vorkommen kann
+worstCaseRL(Number, From, Till) ->
+  todo.
+
+%=================================================================================================================================================
+%                                                     HILFS FUNKTIONEN
+%=================================================================================================================================================
+numberGeneratorHelper(Number, From, Till, Counter, Result) ->
+  if (Number < Counter) ->
+    Result;
+  true ->
+  numberGeneratorHelper(Number, From, Till, Counter + 1, Result ++ [random:uniform(Till) - (From - 1)])
+  end.

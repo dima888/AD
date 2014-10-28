@@ -135,6 +135,7 @@ logging(Datei,Inhalt) -> Known = erlang:whereis(logklc),
     _NotUndef -> ok
   end,
   logklc ! {Datei,Inhalt},
+  logklc ! {Datei,"\r\n"},
   ok.
 
 logstop( ) -> 	Known = erlang:whereis(logklc),
