@@ -18,4 +18,4 @@
 
 start() ->
 
-  util:randomliste(1, 10, 100).
+  util:randomliste(10, 5, 10).
