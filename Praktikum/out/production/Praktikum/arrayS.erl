@@ -16,6 +16,11 @@ initA() ->
 
 %% array × pos × elem → array
 setA({array, Liste}, Pos, Elem) ->
+<<<<<<< HEAD
+=======
+  Array = {array, Liste},
+
+>>>>>>> FETCH_HEAD
   if  % Prüfen ob negative Pos übergeben wurde
       Pos < 0 ->
         % Falls true, nicht modifiziertes Array zurück geben
@@ -31,16 +36,28 @@ setA({array, Liste}, Pos, Elem) ->
             IsPosGreaterThanArrayLength == true ->
 
               % Array mit Nullen befüllen bis Position - 1 erreicht ist um übergebenes Element einzufügen
+<<<<<<< HEAD
               {array, NeueList} = fillUpArray({array, Liste}, AdjustedPos),
               {array, liste:insert(NeueList, AdjustedPos, Elem)};
+=======
+              FilledArray = fillUpArray(Array, AdjustedPos),
+              liste:insert(FilledArray, AdjustedPos, Elem);
+>>>>>>> FETCH_HEAD
 
             % Falls Arraylänge größer oder gleich Pos ist
             true ->
               % Bestehendes Element löschen
+<<<<<<< HEAD
               NeueListe = liste:delete(Liste, AdjustedPos),
 
               % Neues Elementeinfügen
               {array, liste:insert(NeueListe, AdjustedPos, Elem)}
+=======
+              ModifiedArray = liste:delete(Array, AdjustedPos),
+
+              % Neues Elementeinfügen
+              liste:insert(ModifiedArray, AdjustedPos, Elem)
+>>>>>>> FETCH_HEAD
         end
   end.
 
@@ -62,7 +79,11 @@ getA({array, Liste}, Pos) ->
             ArrayLengthGreaterThanOrEqualPos == true ->
 
               % Element zurückgeben
+<<<<<<< HEAD
               liste:retrieve(Liste, AdjustedPos);
+=======
+              liste:retrieve(Array, AdjustedPos);
+>>>>>>> FETCH_HEAD
 
             % Falls
             true ->
@@ -72,8 +93,13 @@ getA({array, Liste}, Pos) ->
   end.
 
 %% array → pos
+<<<<<<< HEAD
 lengthA({array, Liste}) ->
   liste:laenge(Liste).
+=======
+lengthA(Array) ->
+  liste:laenge(Array).
+>>>>>>> FETCH_HEAD
 
 %=================================================================================================================================================
 %                                                       HILFS FUNKTIONEN
@@ -82,7 +108,12 @@ lengthA({array, Liste}) ->
 %% Befüllt das übergebene Array mit Nullen bis zur übergebenen Position
 fillUpArray({array, Liste}, Pos) ->
   % Aktuelle Arraylänge ermitteln
+<<<<<<< HEAD
   CurrentLength = liste:laenge(Liste),
+=======
+  CurrentLength = liste:laenge(Array),
+  %io:format("Arraylänge: ~p~n", [liste:laenge(Array)]),
+>>>>>>> FETCH_HEAD
 
   % Anzahl einzufügender Nullen berechnen
   FillUpCounter = (Pos - 1) - CurrentLength,
@@ -91,9 +122,18 @@ fillUpArray({array, Liste}, Pos) ->
   fillUpArrayR({array, Liste}, FillUpCounter).
 
 % Rekursive Methode um dem übergebenen Array um die Anzahl FillUpCounter Nullen hinzuzufügen
+<<<<<<< HEAD
 fillUpArrayR({array, Liste}, 0) ->
   {array, Liste};
 fillUpArrayR({array, Liste}, FillUpCounter) ->
   NewList = liste:create(),
   ListWithZero = liste:insert(NewList, 1, 0),
   fillUpArrayR(liste:concat({array, Liste}, ListWithZero), FillUpCounter - 1).
+=======
+fillUpArrayR(Array, 0) ->
+  Array;
+fillUpArrayR(Array, FillUpCounter) ->
+  NewList = liste:create(),
+  ListWithZero = liste:insert(NewList, 1, 0),
+  fillUpArrayR(liste:concat(Array, ListWithZero), FillUpCounter - 1).
+>>>>>>> FETCH_HEAD
