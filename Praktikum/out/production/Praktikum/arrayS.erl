@@ -1,21 +1,9 @@
-%% ======== ANFORDERUNGEN =========
-
-%% Das Array beginnt bei Position 0
-
-%% Das Array arbeitet destruktiv, d.h. wird ein Element an einer vorhandenen Position eingefügt,
-%% wird das dort stehende Element überschrieben
-
-%% Die Länge des Arrays wird bestimmt durch die bis zur aktuellen Abfrage größten vorhandenen und
-%% explizit beschriebenen Position im array
-
-%% Das Array ist mit 0 initialisiert, d.h. greift man auf eine bisher noch nicht beschriebene Position
-%% im Array zu erhält man 0 als Wert
-
-%% Das Array hat keine Größenbeschränkung, d.h. bei der Initialisierung wird keine Größe vorgegeben
-
 %=================================================================================================================================================
 %                                              Vorgegebene Schnittstellen der ADT
 %=================================================================================================================================================
+
+% Ein Array besteht aus einem Typ und einer Liste, die standardmäßig leer ist. Das Array hat keine fest-
+% gelegte Länge und kann somit immer wachsen, wenn nötig. Das Array beginnt bei der Position 0.
 
 -module(arrayS).
 
@@ -24,44 +12,43 @@
 
 %% ∅ → array
 initA() ->
-  listeOLD:create().
+  {array, liste:create()}.
 
 %% array × pos × elem → array
-setA(Array, Pos, Elem) ->
+setA({array, Liste}, Pos, Elem) ->
   if  % Prüfen ob negative Pos übergeben wurde
       Pos < 0 ->
         % Falls true, nicht modifiziertes Array zurück geben
-        Array;
+        {array, Liste};
       true ->
         % Position anpassen, da Liste an Pos 1 beginnt und Array an Pos 0
         AdjustedPos = Pos + 1,
 
         % Ergenis der Abfrage speichern, ob die übergebene Pos größer ist als die Länge des übergebenen Arrays
-        IsPosGreaterThanArrayLength = AdjustedPos > lengthA(Array),
+        IsPosGreaterThanArrayLength = AdjustedPos > lengthA({array, Liste}),
 
         if  % Prüfen ob Pos größer ist als Arraylänge
             IsPosGreaterThanArrayLength == true ->
 
               % Array mit Nullen befüllen bis Position - 1 erreicht ist um übergebenes Element einzufügen
-              FilledArray = fillUpArray(Array, AdjustedPos),
-              listeOLD:insert(FilledArray, AdjustedPos, Elem);
+              {array, NeueList} = fillUpArray({array, Liste}, AdjustedPos),
+              {array, liste:insert(NeueList, AdjustedPos, Elem)};
 
             % Falls Arraylänge größer oder gleich Pos ist
             true ->
               % Bestehendes Element löschen
-              ModifiedArray = listeOLD:delete(Array, AdjustedPos),
+              NeueListe = liste:delete(Liste, AdjustedPos),
 
               % Neues Elementeinfügen
-              listeOLD:insert(ModifiedArray, AdjustedPos, Elem)
+              {array, liste:insert(NeueListe, AdjustedPos, Elem)}
         end
   end.
 
 %% array × pos → elem
-getA(Array, Pos) ->
+getA({array, Liste}, Pos) ->
   if  % Prüfen ob negative Pos übergeben wurde
       Pos < 0 ->
-        % TODO: Zu klären was in diesem Fall zurück gegeben werden muss (SKIZZE)
-        todo;
+        leeresObjekt;
 
       % Falls Pos >= 0 ist
       true ->
@@ -69,13 +56,13 @@ getA(Array, Pos) ->
         AdjustedPos = Pos + 1,
 
         % Ergebnis der Abfrage abspeichern
-        ArrayLengthGreaterThanOrEqualPos = lengthA(Array) >= AdjustedPos,
+        ArrayLengthGreaterThanOrEqualPos = lengthA({array, Liste}) >= AdjustedPos,
 
         if  % Prüfen ob die Arraylänge größer oder gleich Pos ist
             ArrayLengthGreaterThanOrEqualPos == true ->
 
               % Element zurückgeben
-              listeOLD:retrieve(Array, AdjustedPos);
+              liste:retrieve(Liste, AdjustedPos);
 
             % Falls
             true ->
@@ -85,33 +72,28 @@ getA(Array, Pos) ->
   end.
 
 %% array → pos
-lengthA(Array) ->
-  listeOLD:laenge(Array).
+lengthA({array, Liste}) ->
+  liste:laenge(Liste).
 
 %=================================================================================================================================================
 %                                                       HILFS FUNKTIONEN
 %=================================================================================================================================================
 
 %% Befüllt das übergebene Array mit Nullen bis zur übergebenen Position
-fillUpArray(Array, Pos) ->
-  %io:format("Arrayinhalt: ~p~n", [Array]),
-  %io:format("Position an der eingefügt werden soll: ~p~n", [Pos]),
-
+fillUpArray({array, Liste}, Pos) ->
   % Aktuelle Arraylänge ermitteln
-  CurrentLength = listeOLD:laenge(Array),
-  %io:format("Arraylänge: ~p~n", [liste:laenge(Array)]),
+  CurrentLength = liste:laenge(Liste),
 
   % Anzahl einzufügender Nullen berechnen
   FillUpCounter = (Pos - 1) - CurrentLength,
-  %io:format("FillUpCounter: ~p~n", [FillUpCounter]),
 
   % Nullen auffüllen
-  fillUpArrayR(Array, FillUpCounter).
+  fillUpArrayR({array, Liste}, FillUpCounter).
 
 % Rekursive Methode um dem übergebenen Array um die Anzahl FillUpCounter Nullen hinzuzufügen
-fillUpArrayR(Array, 0) ->
-  Array;
-fillUpArrayR(Array, FillUpCounter) ->
-  NewList = listeOLD:create(),
-  ListWithZero = listeOLD:insert(NewList, 1, 0),
-  fillUpArrayR(listeOLD:concat(Array, ListWithZero), FillUpCounter - 1).
+fillUpArrayR({array, Liste}, 0) ->
+  {array, Liste};
+fillUpArrayR({array, Liste}, FillUpCounter) ->
+  NewList = liste:create(),
+  ListWithZero = liste:insert(NewList, 1, 0),
+  fillUpArrayR(liste:concat({array, Liste}, ListWithZero), FillUpCounter - 1).

@@ -9,25 +9,25 @@
 
 %% ∅ → stack
 createS() ->
-  liste:create().
+  listeOLD:create().
 
 %% stack × elem → stack
 push(Stack, Elem) ->
   % Länge der Liste ermitteln und um 1 inkrementieren für nächstes Element
-  Pos = liste:laenge(Stack) + 1,
-  liste:insert(Stack, Pos, Elem).
+  Pos = listeOLD:laenge(Stack) + 1,
+  listeOLD:insert(Stack, Pos, Elem).
 
 %% stack → stack
 pop(Stack) ->
   % Letztes Element aus der Liste, oberstes aus dem Stack entfernen
-  Pos = liste:laenge(Stack),
-  liste:delete(Stack, Pos).
+  Pos = listeOLD:laenge(Stack),
+  listeOLD:delete(Stack, Pos).
 
 %% stack → elem
 top(Stack) ->
-  Pos = liste:laenge(Stack),
-  liste:retrieve(Stack, Pos).
+  Pos = listeOLD:laenge(Stack),
+  listeOLD:retrieve(Stack, Pos).
 
 %% stack → bool
 isEmptyS(Stack) ->
-  liste:isEmpty(Stack).
+  listeOLD:isEmpty(Stack).

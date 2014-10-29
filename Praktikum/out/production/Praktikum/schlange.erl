@@ -19,10 +19,10 @@
 createQ() ->
   InStack = stack:createS(),
   OutStack = stack:createS(),
-  [InStack, OutStack].
+  {queue, {InStack, OutStack}}.
 
 %% queue -> elem
-front([InStack, OutStack]) ->
+front({queue, {InStack, OutStack}}) ->
   % Ergebnis der Abfrage speichern
   IsOutStackEmpty = stack:isEmptyS(OutStack),
 
@@ -34,12 +34,11 @@ front([InStack, OutStack]) ->
 
         if  % Prüfen ob Instack ebenfalls leer ist
             IsInStackEmpty == true ->
-              % TODO: Zu klären was in diesem Fall zurück gegeben werden soll
-              todo;
+              leeresObjekt;
 
             % Der Instack ist nicht leer, also Element umverlagern in den Outstack
             true ->
-              [_NewInStack, NewOutStack] = shiftFromInStackToOutStack([InStack, OutStack]),
+              {_NewInStack, NewOutStack} = shiftFromInStackToOutStack({InStack, OutStack}),
               stack:top(NewOutStack)
         end;
 
@@ -48,11 +47,11 @@ front([InStack, OutStack]) ->
   end.
 
 %% queue x elem -> queue
-enqueue([InStack, OutStack], Elem) ->
-  [stack:push(InStack, Elem), OutStack].
+enqueue({queue, {InStack, OutStack}}, Elem) ->
+  {queue, {stack:push(InStack, Elem), OutStack}}.
 
 %% queue -> queue
-dequeue([InStack, OutStack]) ->
+dequeue({queue, {InStack, OutStack}}) ->
   % Ergebnis der Abfrage speichern
   IsOutStackEmpty = stack:isEmptyS(OutStack),
 
@@ -66,38 +65,38 @@ dequeue([InStack, OutStack]) ->
             IsInStackEmpty == true ->
 
               % Beide Stacks sind leer, nicht modifizierte (leere Queue) zurück geben
-              [InStack, OutStack];
+              {queue, {InStack, OutStack}};
 
             % Falls der Instack nicht leer ist, muss umsortiert werden
             true ->
-              [NewInStack, NewOutStack] = shiftFromInStackToOutStack([InStack, OutStack]),
+              {NewInStack, NewOutStack} = shiftFromInStackToOutStack({InStack, OutStack}),
 
               % Oberstes Element entfernen und Queue zurück geben
-              [NewInStack, stack:pop(NewOutStack)]
+              {queue, {NewInStack, stack:pop(NewOutStack)}}
         end;
 
       % Falls der Outstack nicht leer ist, oberstes Element entfernen
       true ->
-        [InStack, stack:pop(OutStack)]
+        {queue, {InStack, stack:pop(OutStack)}}
   end.
 
 %% queue -> bool
-isEmpty([InStack, OutStack]) ->
+isEmpty({queue, {InStack, OutStack}}) ->
   % Falls Instack und Outstack leer sind ist die Queue leer
-  liste:isEmpty(InStack) and liste:isEmpty(OutStack).
+  stack:isEmptyS(InStack) and stack:isEmptyS(OutStack).
 
 %=================================================================================================================================================
 %                                                       HILFS FUNKTIONEN
 %=================================================================================================================================================
 
 %% Verlagert die Elemente vom Instack um in den Outstack
-shiftFromInStackToOutStack([InStack, OutStack]) ->
+shiftFromInStackToOutStack({InStack, OutStack}) ->
   % Rekursive Methode für das Umverlagern, der letzte Parameter ist die Abbruchbedingung
   shiftFromInStackToOutStackR(InStack, OutStack, false).
 
 shiftFromInStackToOutStackR(InStack, OutStack, true) ->
   % Modifizierte Queue zurück geben
-  [InStack, OutStack];
+  {InStack, OutStack};
 shiftFromInStackToOutStackR(InStack, OutStack, false) ->
   %io:format("***Anfang*** InStack: ~p~n", [InStack]),
   %io:format("***Anfang*** OutStack: ~p~n", [OutStack]),

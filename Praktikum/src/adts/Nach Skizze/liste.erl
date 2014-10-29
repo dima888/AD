@@ -26,7 +26,7 @@ create() ->
 % ***************************************** NACH SKIZZE *****************************************************
 isEmpty({liste, {}}) ->
   true;
-isEmpty({liste, Elems}) ->
+isEmpty({liste, _Elems}) ->
   false.
 
 %% list → int
@@ -48,7 +48,7 @@ laenge({liste, Elems}) ->
 % ***************************************** NACH SKIZZE *****************************************************
 insert({liste, Elems}, Pos, Elem) ->
   % Element hinzufügen
-  {liste, insertElem(Elems, Elem, Pos, 1, [], false)}.
+  {liste, insertElem(Elems, Elem, Pos, 1, false)}.
 
 %% list × pos → list
 % ***************************************** NACH SKIZZE *****************************************************
@@ -57,7 +57,7 @@ insert({liste, Elems}, Pos, Elem) ->
 % anfügen der Elemente normal weiter.
 % ***************************************** NACH SKIZZE *****************************************************
 delete({liste, Elems}, Pos) ->
-  {liste, deleteElem(Elems, Pos, 1, [])}.
+  {liste, deleteElem(Elems, Pos, 1)}.
 
 %% list × elem → pos
 % ***************************************** NACH SKIZZE *****************************************************
@@ -78,12 +78,13 @@ retrieve({liste, Elems}, Pos) ->
   retrieveElement(Elems, Pos).
 
 %% list × list → list
-% ***************************************** NACH SKIZZE *****************************************************
+% ***************************************** NICHT NACH SKIZZE *****************************************************
 % Es wird die erste Liste auf einen Iterator geschrieben. Danach wird die zweite Liste mit dem gleichen 
 % Verfahren darüber gesetzt.
-% ***************************************** NACH SKIZZE *****************************************************
-concat(List1, List2) ->
-  notImplementedYet.
+% *** Auf einen Iterator wurde verzichtet, es wurde nur Rekursion verwendet ***
+% ***************************************** NICHT NACH SKIZZE *****************************************************
+concat({liste, Elems1}, {liste, Elems2}) ->
+  concatLists(Elems1, Elems2).
 
 %=================================================================================================================================================
 %                                                       HILFS FUNKTIONEN
@@ -110,59 +111,30 @@ calculateLength({_First, Second}, Counter) ->
 %% @param CurrentPos - Aktuelle Anzahl der Rekursionen
 %% @param Result - Die Resultliste
 %% @param Flag - Ein Flag zum symbolisieren ob das Element an Pos eingefügt wurde
-insertElem({}, Elem, _Pos, _CurrentPos, Result, Flag) ->
-  % Prüfen ob Element schon eingefügt wurde oder nicht
-  if
-    Flag == true -> createStructure(Result);
-    true -> createStructure(Result ++ [Elem])
-  end;
-
-insertElem({First, Second}, Elem, Pos, CurrentPos, Result, _Flag) when Pos == CurrentPos ->
-%% ***************************************** NACH SKIZZE *****************************************************
-%% "Zuerst das einzufügende Element und anschließend das aktuelle Element der Ausgangsliste an die Ergebnisliste gehängt"
-%% ***************************************** NACH SKIZZE *****************************************************
-  insertElem(Second, Elem, Pos, CurrentPos + 1, Result ++ [Elem] ++ [First], true);
-
-insertElem({First, Second}, Elem, Pos, CurrentPos, Result, _Flag) ->
-  insertElem(Second, Elem, Pos, CurrentPos + 1, Result ++ [First], _Flag).
+insertElem({}, _Elem, _Pos, _CurrentPos, ElemAdded) when ElemAdded == true ->
+  {};
+insertElem({}, Elem, _Pos, _CurrentPos, ElemAdded) when ElemAdded == false ->
+  {Elem, {}};
+insertElem({CurrentElem, NextElem}, Elem, Pos, CurrentPos, _ElemAdded) when Pos == CurrentPos ->
+  {Elem, {CurrentElem, insertElem(NextElem, Elem, Pos, CurrentPos + 1, true)}};
+insertElem({CurrentElem, NextElem}, Elem, Pos, CurrentPos, ElemAdded) ->
+  {CurrentElem, insertElem(NextElem, Elem, Pos, CurrentPos + 1, ElemAdded)}.
 
 %% ***************************************** NACH SKIZZE *****************************************************
 %% Abbruchbedingung laut Skizze: Subliste leer => {}
 %% ***************************************** NACH SKIZZE *****************************************************
 %% Zum einfügen eines Elementes in der Liste
 %% @param Liste - Die Liste in welche eingefügt werden soll
-%% @param Elem - Das Element, welches eingefügt werden soll
-%% @param Pos - Die Position an welche das Element eingefügt werden soll
+%% @param Pos - Die Position an welcher das Element entfernt werden soll
 %% @param CurrentPos - Aktuelle Anzahl der Rekursionen
-%% @param Result - Die Resultliste
-%% @param Flag - Ein Flag zum symbolisieren ob das Element an Pos eingefügt wurde
-deleteElem({}, _Pos, _CurrentPos, Result) ->
-  createStructure(Result);
-deleteElem({_First, Second}, Pos, CurrentPos, Result) when Pos == CurrentPos ->
-%% ***************************************** NACH SKIZZE *****************************************************
-%%  das Element am gewünschten Index ausgelassen und einfach übergangen
-%% ***************************************** NACH SKIZZE *****************************************************
-  deleteElem(Second, Pos, CurrentPos + 1, Result);
-deleteElem({First, Second}, Pos, CurrentPos, Result) ->
-  deleteElem(Second, Pos, CurrentPos + 1, Result ++ [First]).
-
-%% Erezugt aus einer platten Liste (1-Dimensional) die geforderte Struktur
-%% @param ResultList - Die Liste mit den enthaltenen Elementen
-createStructure(ResultList) ->
-  createStructure(reverseList(ResultList), {}).
-createStructure([], Result) ->
-  Result;
-createStructure([H|T], Result) ->
-  createStructure(T, {H, Result}).
-
-%% Dreht eine Liste um
-%% @param List - die Liste die verdreht werden soll
-reverseList(List) ->
-  reverseListR(List, []).
-reverseListR([], ReversedList) ->
-  ReversedList;
-reverseListR([H|T], ReversedList) ->
-  reverseListR(T, [H] ++ ReversedList).
+deleteElem({}, _Pos, _CurrentPos) ->
+  {};
+deleteElem({_CurrentElem, {}}, Pos, CurrentPos) when Pos == CurrentPos ->
+  {};
+deleteElem({_CurrentElem, {NextElem, NextNextElem}}, Pos, CurrentPos) when Pos == CurrentPos ->
+  {NextElem, deleteElem(NextNextElem, Pos, CurrentPos + 1)};
+deleteElem({CurrentElem, NextElem}, Pos, CurrentPos) ->
+  {CurrentElem, deleteElem(NextElem, Pos, CurrentPos + 1)}.
 
 %% Sucht die Position des übergebenen Elements in Elems
 %% @param Elems - Die Liste ohne Typ in der gesucht werden soll
@@ -179,26 +151,49 @@ findPosition({CurrentElem, _NextElem}, Elem, Counter) when CurrentElem == Elem -
 findPosition({_CurrentElem, NextElem}, Elem, Counter) ->
   findPosition(NextElem, Elem, Counter + 1).
 
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Der Index pos ent- spricht der Anzahl Iterationsschritten, die notwendig sind, um zur gewünschten Stelle
+%% in der Liste zu gelangen
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Sucht nach dem Element an der übergebenen Position
+%% @param Liste - Die Liste in der gesucht werden soll
+%% @param Pos - Die Position an welcher sich das Element befinden soll
+%% @param Counter - Zähler für die Rekursionsschritte
 retrieveElement(Elems, Pos) ->
   % Abfrage Ergebnis abspeichern
   IsPosGreaterThanListLengthOrLessThenZero = (Pos > liste:laenge({liste, Elems})) or (Pos < 1),
 
   if
-     % Pos > als Listenlänge oder < 1
-     IsPosGreaterThanListLengthOrLessThenZero == true ->
-        %% ***************************************** NACH SKIZZE *****************************************************
-        %% wir haben bei allen aufgeführten Funktionen (bis auf find) dann an eine leeres Objekt gedacht, weil wir da
-        %% der Meinung waren, dass das noch ziemlich oberflächlich ist und nicht zu nah an einer Implementation steht,
-        %% trotzdem jedoch eine eindeutige Angabe ist. Wobei dann die Frage wäre, ob das spezifisch genug ist, oder
-        %% man noch weiter in das Detail gehen soll
-        %% ***************************************** NACH SKIZZE *****************************************************
-        leeresObjekt;
+  % Pos > als Listenlänge oder < 1
+    IsPosGreaterThanListLengthOrLessThenZero == true ->
+      %% ***************************************** NACH SKIZZE *****************************************************
+      %% wir haben bei allen aufgeführten Funktionen (bis auf find) dann an eine leeres Objekt gedacht, weil wir da
+      %% der Meinung waren, dass das noch ziemlich oberflächlich ist und nicht zu nah an einer Implementation steht,
+      %% trotzdem jedoch eine eindeutige Angabe ist. Wobei dann die Frage wäre, ob das spezifisch genug ist, oder
+      %% man noch weiter in das Detail gehen soll
+      %% ***************************************** NACH SKIZZE *****************************************************
+      leeresObjekt;
 
-    % Pos <= Listenlänge
+  % Pos <= Listenlänge
     true ->
-        retrieveElementR(Elems, Pos, 1)
+      retrieveElementR(Elems, Pos, 1)
   end.
 retrieveElementR({CurrentElem, _NextElem}, Pos, Counter) when Pos == Counter ->
   CurrentElem;
 retrieveElementR({_CurrentElem, NextElem}, Pos, Counter) ->
   retrieveElementR(NextElem, Pos, Counter + 1).
+
+%% ***************************************** NICHT NACH SKIZZE *****************************************************
+%% Es wird die erste Liste auf einen Iterator geschrieben. Danach wird die zweite Liste mit dem gleichen
+%% Verfahren darüber gesetzt.
+%% **** Es wurde auf einen Iterator (Zwischenspeicher) verzichtet und rekursiv gelöst ****
+%% ***************************************** NICHT NACH SKIZZE *****************************************************
+%% Konkatiniert 2 Listen
+%% @param Liste1 - Die erste Liste die Konkatiniert werden soll
+%% @param Liste2 - Die zweite Liste, die mit der ersten konkatiniert werden soll
+concatLists({}, {}) ->
+  {};
+concatLists({CurrentElem, NextElem}, List2) ->
+  {CurrentElem, concatLists(NextElem, List2)};
+concatLists({}, {CurrentElem, NextElem}) ->
+  {CurrentElem, concatLists({}, NextElem)}.

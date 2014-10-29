@@ -13,20 +13,20 @@
 
 %% ∅ → queue
 createQ() ->
-  InStack = liste:create(),
-  OutStack = liste:create(),
+  InStack = listeOLD:create(),
+  OutStack = listeOLD:create(),
   [InStack, OutStack].
 
 %% queue -> elem
 front([InStack, OutStack]) ->
   % Ergebnis der Abfrage speichern
-  IsOutStackEmpty = liste:isEmpty(OutStack),
+  IsOutStackEmpty = listeOLD:isEmpty(OutStack),
 
   if  % Prüfen ob der Outstack leer ist
       IsOutStackEmpty == true ->
 
         % Ergebnis der Abfrage speichern
-        IsInStackEmpty = liste:isEmpty(InStack),
+        IsInStackEmpty = listeOLD:isEmpty(InStack),
 
         if  % Prüfen ob Instack ebenfalls leer ist
             IsInStackEmpty == true ->
@@ -80,7 +80,7 @@ dequeue([InStack, OutStack]) ->
 %% queue -> bool
 isEmpty([InStack, OutStack]) ->
   % Falls Instack und Outstack leer sind ist die Queue leer
-  liste:isEmpty(InStack) and liste:isEmpty(OutStack).
+  listeOLD:isEmpty(InStack) and listeOLD:isEmpty(OutStack).
 
 %=================================================================================================================================================
 %                                                       HILFS FUNKTIONEN

@@ -24,7 +24,7 @@
 
 %% ∅ → array
 initA() ->
-  liste:create().
+  listeOLD:create().
 
 %% array × pos × elem → array
 setA(Array, Pos, Elem) ->
@@ -44,15 +44,15 @@ setA(Array, Pos, Elem) ->
 
               % Array mit Nullen befüllen bis Position - 1 erreicht ist um übergebenes Element einzufügen
               FilledArray = fillUpArray(Array, AdjustedPos),
-              liste:insert(FilledArray, AdjustedPos, Elem);
+              listeOLD:insert(FilledArray, AdjustedPos, Elem);
 
             % Falls Arraylänge größer oder gleich Pos ist
             true ->
               % Bestehendes Element löschen
-              ModifiedArray = liste:delete(Array, AdjustedPos),
+              ModifiedArray = listeOLD:delete(Array, AdjustedPos),
 
               % Neues Elementeinfügen
-              liste:insert(ModifiedArray, AdjustedPos, Elem)
+              listeOLD:insert(ModifiedArray, AdjustedPos, Elem)
         end
   end.
 
@@ -75,7 +75,7 @@ getA(Array, Pos) ->
             ArrayLengthGreaterThanOrEqualPos == true ->
 
               % Element zurückgeben
-              liste:retrieve(Array, AdjustedPos);
+              listeOLD:retrieve(Array, AdjustedPos);
 
             % Falls
             true ->
@@ -86,7 +86,7 @@ getA(Array, Pos) ->
 
 %% array → pos
 lengthA(Array) ->
-  liste:laenge(Array).
+  listeOLD:laenge(Array).
 
 %=================================================================================================================================================
 %                                                       HILFS FUNKTIONEN
@@ -98,7 +98,7 @@ fillUpArray(Array, Pos) ->
   %io:format("Position an der eingefügt werden soll: ~p~n", [Pos]),
 
   % Aktuelle Arraylänge ermitteln
-  CurrentLength = liste:laenge(Array),
+  CurrentLength = listeOLD:laenge(Array),
   %io:format("Arraylänge: ~p~n", [liste:laenge(Array)]),
 
   % Anzahl einzufügender Nullen berechnen
@@ -112,6 +112,6 @@ fillUpArray(Array, Pos) ->
 fillUpArrayR(Array, 0) ->
   Array;
 fillUpArrayR(Array, FillUpCounter) ->
-  NewList = liste:create(),
-  ListWithZero = liste:insert(NewList, 1, 0),
-  fillUpArrayR(liste:concat(Array, ListWithZero), FillUpCounter - 1).
+  NewList = listeOLD:create(),
+  ListWithZero = listeOLD:insert(NewList, 1, 0),
+  fillUpArrayR(listeOLD:concat(Array, ListWithZero), FillUpCounter - 1).
