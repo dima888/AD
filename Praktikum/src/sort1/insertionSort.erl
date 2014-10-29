@@ -27,6 +27,11 @@
 
 
 %% Einzige Schnittstelle nach aussen
+%% @param Array Array - Der zur sortierende Array
+%% @param Integer Von - Kleinster Index Wert vom Array
+%% @param Integer Bis - Groesster Index Wert vom Array
 insertionS(Array, Von, Bis) ->
+
+
 
   todo.
