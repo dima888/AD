@@ -1,21 +1,9 @@
-%% ======== ANFORDERUNGEN =========
-
-%% Das Array beginnt bei Position 0
-
-%% Das Array arbeitet destruktiv, d.h. wird ein Element an einer vorhandenen Position eingefügt,
-%% wird das dort stehende Element überschrieben
-
-%% Die Länge des Arrays wird bestimmt durch die bis zur aktuellen Abfrage größten vorhandenen und
-%% explizit beschriebenen Position im array
-
-%% Das Array ist mit 0 initialisiert, d.h. greift man auf eine bisher noch nicht beschriebene Position
-%% im Array zu erhält man 0 als Wert
-
-%% Das Array hat keine Größenbeschränkung, d.h. bei der Initialisierung wird keine Größe vorgegeben
-
 %=================================================================================================================================================
 %                                              Vorgegebene Schnittstellen der ADT
 %=================================================================================================================================================
+
+% Ein Array besteht aus einem Typ und einer Liste, die standardmäßig leer ist. Das Array hat keine fest-
+% gelegte Länge und kann somit immer wachsen, wenn nötig. Das Array beginnt bei der Position 0.
 
 -module(arrayS).
 
@@ -24,10 +12,12 @@
 
 %% ∅ → array
 initA() ->
-  listeOLD:create().
+  {array, liste:create()}.
 
 %% array × pos × elem → array
-setA(Array, Pos, Elem) ->
+setA({array, Liste}, Pos, Elem) ->
+  Array = {array, Liste},
+
   if  % Prüfen ob negative Pos übergeben wurde
       Pos < 0 ->
         % Falls true, nicht modifiziertes Array zurück geben
@@ -44,15 +34,15 @@ setA(Array, Pos, Elem) ->
 
               % Array mit Nullen befüllen bis Position - 1 erreicht ist um übergebenes Element einzufügen
               FilledArray = fillUpArray(Array, AdjustedPos),
-              listeOLD:insert(FilledArray, AdjustedPos, Elem);
+              liste:insert(FilledArray, AdjustedPos, Elem);
 
             % Falls Arraylänge größer oder gleich Pos ist
             true ->
               % Bestehendes Element löschen
-              ModifiedArray = listeOLD:delete(Array, AdjustedPos),
+              ModifiedArray = liste:delete(Array, AdjustedPos),
 
               % Neues Elementeinfügen
-              listeOLD:insert(ModifiedArray, AdjustedPos, Elem)
+              liste:insert(ModifiedArray, AdjustedPos, Elem)
         end
   end.
 
@@ -75,7 +65,7 @@ getA(Array, Pos) ->
             ArrayLengthGreaterThanOrEqualPos == true ->
 
               % Element zurückgeben
-              listeOLD:retrieve(Array, AdjustedPos);
+              liste:retrieve(Array, AdjustedPos);
 
             % Falls
             true ->
@@ -86,7 +76,7 @@ getA(Array, Pos) ->
 
 %% array → pos
 lengthA(Array) ->
-  listeOLD:laenge(Array).
+  liste:laenge(Array).
 
 %=================================================================================================================================================
 %                                                       HILFS FUNKTIONEN
@@ -98,7 +88,7 @@ fillUpArray(Array, Pos) ->
   %io:format("Position an der eingefügt werden soll: ~p~n", [Pos]),
 
   % Aktuelle Arraylänge ermitteln
-  CurrentLength = listeOLD:laenge(Array),
+  CurrentLength = liste:laenge(Array),
   %io:format("Arraylänge: ~p~n", [liste:laenge(Array)]),
 
   % Anzahl einzufügender Nullen berechnen
@@ -112,6 +102,6 @@ fillUpArray(Array, Pos) ->
 fillUpArrayR(Array, 0) ->
   Array;
 fillUpArrayR(Array, FillUpCounter) ->
-  NewList = listeOLD:create(),
-  ListWithZero = listeOLD:insert(NewList, 1, 0),
-  fillUpArrayR(listeOLD:concat(Array, ListWithZero), FillUpCounter - 1).
+  NewList = liste:create(),
+  ListWithZero = liste:insert(NewList, 1, 0),
+  fillUpArrayR(liste:concat(Array, ListWithZero), FillUpCounter - 1).

@@ -2,7 +2,7 @@
 %                                              Vorgegebene Schnittstellen der ADT
 %=================================================================================================================================================
 
--module(stack).
+-module(stackOLD).
 
 %% API
 -export([createS/0, push/2, pop/1, top/1, isEmptyS/1]).

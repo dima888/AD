@@ -6,7 +6,7 @@
 %                                              Vorgegebene Schnittstellen der ADT
 %=================================================================================================================================================
 
--module(schlange).
+-module(schlangeOLD).
 
 %% API
 -export([createQ/0, front/1, enqueue/2, dequeue/1, isEmpty/1]).
@@ -36,27 +36,27 @@ front([InStack, OutStack]) ->
             % Der Instack ist nicht leer, also Element umverlagern in den Outstack
             true ->
               [NewInStack, NewOutStack] = shiftFromInStackToOutStack([InStack, OutStack]),
-              stack:top(NewOutStack)
+              stackOLD:top(NewOutStack)
         end;
 
       true -> % Der Outstack ist nicht leer also oberstes (älteste durch Umverlagerung) Element zurück geben
-              stack:top(OutStack)
+              stackOLD:top(OutStack)
   end.
 
 %% queue x elem -> queue
 enqueue([InStack, OutStack], Elem) ->
-  [stack:push(InStack, Elem), OutStack].
+  [stackOLD:push(InStack, Elem), OutStack].
 
 %% queue -> queue
 dequeue([InStack, OutStack]) ->
   % Ergebnis der Abfrage speichern
-  IsOutStackEmpty = stack:isEmptyS(OutStack),
+  IsOutStackEmpty = stackOLD:isEmptyS(OutStack),
 
   if  % Prüfen ob der Outstack leer ist
       IsOutStackEmpty == true ->
 
         % Ergebnis der Abfrage speichern
-        IsInStackEmpty = stack:isEmptyS(InStack),
+        IsInStackEmpty = stackOLD:isEmptyS(InStack),
 
         if  % Prüfen ob der Instack ebenfalls leer ist
             IsInStackEmpty == true ->
@@ -69,12 +69,12 @@ dequeue([InStack, OutStack]) ->
               [NewInStack, NewOutStack] = shiftFromInStackToOutStack([InStack, OutStack]),
 
               % Oberstes Element entfernen und Queue zurück geben
-              [NewInStack, stack:pop(NewOutStack)]
+              [NewInStack, stackOLD:pop(NewOutStack)]
         end;
 
       % Falls der Outstack nicht leer ist, oberstes Element entfernen
       true ->
-        [InStack, stack:pop(OutStack)]
+        [InStack, stackOLD:pop(OutStack)]
   end.
 
 %% queue -> bool
@@ -99,7 +99,7 @@ shiftFromInStackToOutStackR(InStack, OutStack, false) ->
   %io:format("***Anfang*** OutStack: ~p~n", [OutStack]),
 
   % Ergebnis der Abfrage abspeichern
-  IsInStackEmpty = stack:isEmptyS(InStack),
+  IsInStackEmpty = stackOLD:isEmptyS(InStack),
 
   if  % Falls der Instack leer ist, wurden alle Elemente umverlagert und der Durchlauf soll beendet werden
       IsInStackEmpty == true ->
@@ -109,13 +109,13 @@ shiftFromInStackToOutStackR(InStack, OutStack, false) ->
       % Der Stack ist nicht leer, also oberstes Element aus Instack umverlagern und rekursiv aufrufen
       true ->
         % Oberstes Element abspeichern
-        TopElementOfInStack = stack:top(InStack),
+        TopElementOfInStack = stackOLD:top(InStack),
 
         % OutStack mit hinzugefügtem Element
-        NewOutStack = stack:push(OutStack, TopElementOfInStack),
+        NewOutStack = stackOLD:push(OutStack, TopElementOfInStack),
 
         % Umverlagertes Element entfernen
-        NewInStack = stack:pop(InStack),
+        NewInStack = stackOLD:pop(InStack),
 
         %io:format("***Ende*** NewInStack: ~p~n", [NewInStack]),
         %io:format("***Ende*** NewOutStack: ~p~n", [NewOutStack]),

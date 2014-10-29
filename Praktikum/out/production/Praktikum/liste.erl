@@ -1,245 +1,204 @@
-%% ======== ANFORDERUNGEN =========
-
-%% Eine ADT Liste ist zu implementieren: als  einfach verkette Liste
-
-%% Die Liste beginnt bei Position 1
-
-%% Die Liste arbeitet nicht destruktiv, d.h. wird ein Element an einer vorhandenen Position eingefügt,
-%% wird das dort stehende Element um eine Position verschoben
-
-%% Fehlerbehandlung: sollten nicht vorhandene Elemente gelöscht werden, in der Liste an unmöglicher Stelle
-%% eingefügt werden, von einem leeren Stack das oberste Element gelöscht werden etc. ist die Fehlerbehandlung
-%% durch "Ignorieren" durchzuführen, d.h. es wird so gehandelt, als wäre die Operation in Ordnung gewesen und z.B.
-%% eine nicht modifizierte Datenstruktur zurück gegeben
-
 %=================================================================================================================================================
-%                                                           STRUKTUR DER LISTE
-% Unsere Struktur ist ganz simpel, sie besteht auf drei Elementiger Liste,
-% An erster Position ist der Index des Elementes,
-% an zweiter Position ist das Element selbst und
-% an dritter Stelle steht das Index des nachfolgenden Elementes.
-% Beispiel: [ [1, "hallo", 2 ], [2, "tschuess", ?], ... ]
+%                                              Vorgegebene Schnittstellen der ADT
 %=================================================================================================================================================
 
+% Die Liste ist ein Tupel, welches aus einem Typidentifier und einer Subliste besteht. Eine Subliste ist
+% wiederum ein Tupel, welches entweder leer ist, um das Ende der Liste zu symbolisieren, oder aus einem
+% beliebigen Element und einer weiteren Subliste besteht. Die Subliste ist also immer wieder in sich
+% geschachtelt, bis das Ende der Liste erreicht ist.
 
 -module(liste).
 
 %% API
--export([create/0, isEmpty/1, laenge/1, insert/3, delete/2, find/2, retrieve/2, concat/2
-                      ]).
+-export([create/0, isEmpty/1, laenge/1, insert/3, delete/2, find/2, retrieve/2, concat/2]).
 
 %% ∅ → list
+% ***************************************** NACH SKIZZE *****************************************************
+% Erstellt eine Instanz von dem Listentupel mit einer leeren Subliste.
+% Struktur festgelegt durch Skizze: {TYP, {}}
+% ***************************************** NACH SKIZZE *****************************************************
 create() ->
-  [].
+  {liste, {}}.
 
 %% list → bool
-isEmpty([]) ->
+% ***************************************** NACH SKIZZE *****************************************************
+% Es wird geprüft, ob die oberste, also erste, Subliste im Tupel die leere Subliste ist.
+% ***************************************** NACH SKIZZE *****************************************************
+isEmpty({liste, {}}) ->
   true;
-isEmpty(List) ->
+isEmpty({liste, Elems}) ->
   false.
 
 %% list → int
-laenge(List) ->
-  lengthHelper(List, 0).
+% ***************************************** NACH SKIZZE *****************************************************
+% Die Subliste wird durchiteriert, bis die leere Subliste erreicht ist. Die Länge der Liste der entspricht 
+% der Anzahl von Iterationsschritten.
+% ***************************************** NACH SKIZZE *****************************************************
+laenge({liste, Elems}) ->
+  calculateLength(Elems, 0).
 
 %% list × pos × elem → list
-insert(List, Pos, Elem) ->
-  LastIndex = getLastIndex(List),
-
-  % PRECONDITION, FALLS DIE LISTE NOCH LEER IST
-  if ( (List == [] ) and (Pos == 1) ) ->
-    [ [Pos, Elem, undefined] ];
-    ( (List == [] ) and (Pos /= 1) ) ->
-      [];
-  % PRECONDITION, ELEMENT HINTEN ANHAENGEN
-    (Pos == LastIndex + 1) ->
-      modifyIndices(concat(List, [ [Pos, Elem, undefined] ] ));
-  true ->
-
-   % PRECONDION, FALLS DIE POSITION NICHT LEGITIM IST
-    if ( (Pos > LastIndex) or (Pos < 1) ) ->
-      List;
-    true ->
-      [Head | Tail] = List,
-
-      % Alle Elemente vor der neuen Position ermitteln
-      ListBeforeElem = insertHelperbefore(Head, Tail, Pos, [], 1),
-
-      % Neues Element Reinhaengen
-       HalfList = concat(ListBeforeElem, [ [Pos, Elem, undefined] ] ),
-
-      % Alle Elemente Nach den neuen Element hollen
-       ListAfterElem = insertHelperAfter(Head, Tail, Pos, [], 1),
-
-      % Liste zusammen bauen und mit den modifizierten Indices zurueck geben
-      modifyIndices(concat(HalfList, ListAfterElem ))
-    end
-  end.
+% ***************************************** NACH SKIZZE *****************************************************
+% Es wird über die Liste iteriert. Bei jedem Iterationsschritt wird das aktuelle Element 
+% der Ausgangsliste der Ergebnisliste angefügt. Falls man sich an der gewünschten Position in der 
+% Ausgangsliste befindet, werden zuerst das einzufügende Element und anschließend das aktuelle Element 
+% der Ausgangsliste an die Ergebnisliste gehängt. Ab diesem Punkt werden nur noch die restlichen Elemente 
+% der Aus- gangsliste angefügt. Falls sich der Index der Position, an dem das Element eingefügt werden 
+% sollte, außerhalb der Länge der Liste befindet, wird das Element einfach an das Ende der Liste angefügt.
+% ***************************************** NACH SKIZZE *****************************************************
+insert({liste, Elems}, Pos, Elem) ->
+  % Element hinzufügen
+  {liste, insertElem(Elems, Elem, Pos, 1, [], false)}.
 
 %% list × pos → list
-delete([], Pos) ->
-  [];
-delete(List, Pos) ->
-  modifyIndices(deleteHelper(List, Pos)).
+% ***************************************** NACH SKIZZE *****************************************************
+% Delete arbeitet ähnlich wie insert, der Unterschied liegt darin, dass anstatt des Einfügens eines neu- en 
+% Elements, wird das Element am gewünschten Index ausgelassen und einfach übergangen. Danach läuft das 
+% anfügen der Elemente normal weiter.
+% ***************************************** NACH SKIZZE *****************************************************
+delete({liste, Elems}, Pos) ->
+  {liste, deleteElem(Elems, Pos, 1, [])}.
 
 %% list × elem → pos
-find(List, Elem) ->
-  findHelper(List, Elem).
+% ***************************************** NACH SKIZZE *****************************************************
+% Es wird so lange über die Liste iteriert, bis das aktuelle Element der Liste dem gesuchten Element 
+% entspricht. Zurückgegeben wird die Anzahl notwendiger Iterationsschritte, um das Element zu fin- den, 
+% die der Position des Elements in der Liste entspricht.
+% ***************************************** NACH SKIZZE *****************************************************
+find({liste, Elems}, Elem) ->
+  findPosition(Elems, Elem, 1).
 
 %% list × pos → elem
-retrieve(List, Pos) ->
-  retrieveHelper(List, Pos).
+% ***************************************** NACH SKIZZE *****************************************************
+% Gibt das Element, das an der angegebenen Position in der Liste steht, zurück. Der Index pos ent- spricht 
+% der Anzahl Iterationsschritten, die notwendig sind, um zur gewünschten Stelle in der Liste zu gelangen, 
+% von der man das Element zurückgibt.
+% ***************************************** NACH SKIZZE *****************************************************
+retrieve({liste, Elems}, Pos) ->
+  retrieveElement(Elems, Pos).
 
 %% list × list → list
+% ***************************************** NACH SKIZZE *****************************************************
+% Es wird die erste Liste auf einen Iterator geschrieben. Danach wird die zweite Liste mit dem gleichen 
+% Verfahren darüber gesetzt.
+% ***************************************** NACH SKIZZE *****************************************************
 concat(List1, List2) ->
-  % PRECONDITION, FALLS DIE LISTE NICHT GETEILT WERDEN KANN
-  if (List1 == []) ->
-    concatHelper([], List2);
-  true ->
-  [Head | Tail] = List1,
-  % Listen konkateniert
-  concatHelper([Head | Tail], List2)
-  end.
+  notImplementedYet.
 
 %=================================================================================================================================================
-%                                                     HILFS FUNKTIONEN
+%                                                       HILFS FUNKTIONEN
 %=================================================================================================================================================
 
-%% Das ist eine Hilfsfunktion fuer die ermittlung einer laenge der Liste
-lengthHelper([], Counter) ->
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Durch Skizze festgelegt: Liste durchlaufen bis leere Subliste erreicht
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Berechnet die Länge der übergebenen Liste
+%% @param Liste - Die Liste dessen länge bestimmt werden soll
+%% @param Counter - Zähler für die Listenelemente
+calculateLength({}, Counter) ->
   Counter;
-lengthHelper(List, Counter) ->
-  [_ | Tail] = List,
-  lengthHelper(Tail, Counter + 1).
+calculateLength({_First, Second}, Counter) ->
+  calculateLength(Second, Counter + 1).
 
-%% Gibt Alle Elemente vor der Position eines Elements
-insertHelperbefore(Head, Tail, Pos, Buffer, Counter) ->
-  if (Tail == []) ->
-    Buffer;
-  true ->
-  % Neue Teilung von unseren Tail
-    [SecondElem | Rest] = Tail,
-
-    % Abbruchbedingung
-    % if (Index == Pos) ->
-    if (Counter == Pos) ->
-     Buffer;
-    true ->
-      insertHelperbefore(SecondElem, Rest, Pos, Buffer ++ [Head], Counter + 1)
-    end
-  end.
-
-%% weiß nicht mehr :D
-insertHelperAfter(Head, Tail, Pos, Buffer, Counter) ->
-  if (Tail == []) ->
-    concat(Buffer, [Head]);
-  true ->
-    % Neue Teilung von unseren Tail
-    [SecondElem | Rest] = Tail,
-
-    % Abbruchbedingung
-    %if (Index >= Pos) ->
-    if (Counter >= Pos) ->
-      insertHelperAfter(SecondElem, Rest, Pos, concat(Buffer, [Head]), Counter + 1);
-    true ->
-      insertHelperAfter(SecondElem, Rest, Pos, Buffer, Counter + 1)
-    end
-  end.
-
-%% Diese Funktion gibt den groessten Index in einer Liste
-getLastIndex(List) ->
-  % PRECONDITION FALLS DIE LISTE LEER IST
-  if (List == []) ->
-    0;
-  true ->
-  [Head | Tail] = List,
-  getLastIndex(Head, Tail, 1)
-  end.
-getLastIndex(_, [], Counter) -> Counter;
-getLastIndex(_, Tail, Counter) ->
-  [SecondElem | Rest] = Tail,
-  getLastIndex(SecondElem, Rest, Counter + 1).
-
-%% Diese Funktion fuegt zwei Liste zusammen
-concatHelper([], List2) ->
-  List2;
-concatHelper([H | T], List2) ->
-  [ H | concatHelper(T, List2) ].
-
-%% Lieft den Index zur einem Element zurueck
-findHelper(List, Elem) ->
-  [Head | Tail] = List,
-  findHelper(Head, Tail, Elem).
-findHelper(Head, [], Elem) ->
-  [Index, Element, _] = Head,
-  if (Element == Elem) ->
-    Index;
-    true ->
-      elementExestiertNicht
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Abbruchbedingung laut Skizze: Subliste leer => {}
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Zum einfügen eines Elementes in der Liste
+%% @param Liste - Die Liste in welche eingefügt werden soll
+%% @param Elem - Das Element, welches eingefügt werden soll
+%% @param Pos - Die Position an welche das Element eingefügt werden soll
+%% @param CurrentPos - Aktuelle Anzahl der Rekursionen
+%% @param Result - Die Resultliste
+%% @param Flag - Ein Flag zum symbolisieren ob das Element an Pos eingefügt wurde
+insertElem({}, Elem, _Pos, _CurrentPos, Result, Flag) ->
+  % Prüfen ob Element schon eingefügt wurde oder nicht
+  if
+    Flag == true -> createStructure(Result);
+    true -> createStructure(Result ++ [Elem])
   end;
-findHelper(Head, Tail, Elem) ->
-  % Abbruchbedingung definieren
-  [Index, Element, _] = Head,
-  if (Element == Elem) ->
-    Index;
-  true ->
-    [SecondElem | Rest] = Tail,
-    findHelper(SecondElem, Rest, Elem)
-  end.
 
-%% Diese Funktion errechnet die Indices neu
-modifyIndices([]) -> [];
-modifyIndices(List) ->
-  [Head | Tail] = List,
-  mofifyIndices(Head, Tail, 1, []).
-mofifyIndices(Head, [], Counter, Result) ->
-  [_, Element, _] = Head,
+insertElem({First, Second}, Elem, Pos, CurrentPos, Result, _Flag) when Pos == CurrentPos ->
+%% ***************************************** NACH SKIZZE *****************************************************
+%% "Zuerst das einzufügende Element und anschließend das aktuelle Element der Ausgangsliste an die Ergebnisliste gehängt"
+%% ***************************************** NACH SKIZZE *****************************************************
+  insertElem(Second, Elem, Pos, CurrentPos + 1, Result ++ [Elem] ++ [First], true);
 
-  %Das ist die Stelle, wohin das letzte Element zeigt, naemlich auf undefinded
-  concat(Result, [ [Counter, Element, undefined] ]);
-mofifyIndices(Head, Tail, Counter, Result) ->
-  [_, Element, _] = Head,
-  [SecondHead | Rest] = Tail,
-  mofifyIndices(SecondHead, Rest, Counter + 1, concat(Result, [ [Counter, Element, Counter + 1] ])).
+insertElem({First, Second}, Elem, Pos, CurrentPos, Result, _Flag) ->
+  insertElem(Second, Elem, Pos, CurrentPos + 1, Result ++ [First], _Flag).
 
-%% Entfernt ein Element von einer bestimmten Position in einer Liste
-deleteHelper(List, Pos) ->
-  [Head | Tail] = List,
-  deleteHelper(Head, Tail, Pos, []).
-deleteHelper(Head, [], Pos, Result) ->
-  [Index, Element, SuccessorIndex] = Head,
-  if (Pos /= Index) ->
-    concat(Result, [ [Index, Element, SuccessorIndex] ]);
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Abbruchbedingung laut Skizze: Subliste leer => {}
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Zum einfügen eines Elementes in der Liste
+%% @param Liste - Die Liste in welche eingefügt werden soll
+%% @param Elem - Das Element, welches eingefügt werden soll
+%% @param Pos - Die Position an welche das Element eingefügt werden soll
+%% @param CurrentPos - Aktuelle Anzahl der Rekursionen
+%% @param Result - Die Resultliste
+%% @param Flag - Ein Flag zum symbolisieren ob das Element an Pos eingefügt wurde
+deleteElem({}, _Pos, _CurrentPos, Result) ->
+  createStructure(Result);
+deleteElem({_First, Second}, Pos, CurrentPos, Result) when Pos == CurrentPos ->
+%% ***************************************** NACH SKIZZE *****************************************************
+%%  das Element am gewünschten Index ausgelassen und einfach übergangen
+%% ***************************************** NACH SKIZZE *****************************************************
+  deleteElem(Second, Pos, CurrentPos + 1, Result);
+deleteElem({First, Second}, Pos, CurrentPos, Result) ->
+  deleteElem(Second, Pos, CurrentPos + 1, Result ++ [First]).
+
+%% Erezugt aus einer platten Liste (1-Dimensional) die geforderte Struktur
+%% @param ResultList - Die Liste mit den enthaltenen Elementen
+createStructure(ResultList) ->
+  createStructure(reverseList(ResultList), {}).
+createStructure([], Result) ->
+  Result;
+createStructure([H|T], Result) ->
+  createStructure(T, {H, Result}).
+
+%% Dreht eine Liste um
+%% @param List - die Liste die verdreht werden soll
+reverseList(List) ->
+  reverseListR(List, []).
+reverseListR([], ReversedList) ->
+  ReversedList;
+reverseListR([H|T], ReversedList) ->
+  reverseListR(T, [H] ++ ReversedList).
+
+%% Sucht die Position des übergebenen Elements in Elems
+%% @param Elems - Die Liste ohne Typ in der gesucht werden soll
+%% @param Elem - Das Element, nach dem gesucht werden soll
+%% @param Counter - Zähler der die Iterationsschritte zählt
+findPosition({}, _Elem, _Counter) ->
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Bei find wird eine unmögliche Position zurückgeben, da die Liste aus Indexen größer also 0 theoretisch
+%% bestehen kann, wäre es eine Zahl die kleiner/gleich 0 ist
+%% ***************************************** NACH SKIZZE *****************************************************
+  -1;
+findPosition({CurrentElem, _NextElem}, Elem, Counter) when CurrentElem == Elem ->
+  Counter;
+findPosition({_CurrentElem, NextElem}, Elem, Counter) ->
+  findPosition(NextElem, Elem, Counter + 1).
+
+retrieveElement(Elems, Pos) ->
+  % Abfrage Ergebnis abspeichern
+  IsPosGreaterThanListLengthOrLessThenZero = (Pos > liste:laenge({liste, Elems})) or (Pos < 1),
+
+  if
+     % Pos > als Listenlänge oder < 1
+     IsPosGreaterThanListLengthOrLessThenZero == true ->
+        %% ***************************************** NACH SKIZZE *****************************************************
+        %% wir haben bei allen aufgeführten Funktionen (bis auf find) dann an eine leeres Objekt gedacht, weil wir da
+        %% der Meinung waren, dass das noch ziemlich oberflächlich ist und nicht zu nah an einer Implementation steht,
+        %% trotzdem jedoch eine eindeutige Angabe ist. Wobei dann die Frage wäre, ob das spezifisch genug ist, oder
+        %% man noch weiter in das Detail gehen soll
+        %% ***************************************** NACH SKIZZE *****************************************************
+        leeresObjekt;
+
+    % Pos <= Listenlänge
     true ->
-      Result
-  end;
-deleteHelper(Head, Tail, Pos, Result) ->
-  [SecondHead | Rest] = Tail,
-  [Index, Element, SuccessorIndex] = Head,
-  if (Pos /= Index) ->
-    deleteHelper(SecondHead, Rest, Pos, concat(Result, [ [Index, Element, SuccessorIndex] ] ));
-  true ->
-    deleteHelper(SecondHead, Rest, Pos, Result)
+        retrieveElementR(Elems, Pos, 1)
   end.
-
-%% Diese Funktion findet ein Element zur einer Position
-retrieveHelper([], Pos) -> todo;
-retrieveHelper(List, Pos) ->
-  [Head | Tail] = List,
-  retrieveHelper(Head, Tail, Pos).
-retrieveHelper(Head, [], Pos) ->
-  [Index, Element, _] = Head,
-  if (Index == Pos) ->
-    Element;
-    true ->
-      positionExestiertNicht
-  end;
-retrieveHelper(Head, Tail, Pos) ->
-  % Abbruchbedingung definieren
-  [Index, Element, _] = Head,
-  if (Index == Pos) ->
-    Element;
-    true ->
-      [SecondElem | Rest] = Tail,
-      retrieveHelper(SecondElem, Rest, Pos)
-  end.
+retrieveElementR({CurrentElem, _NextElem}, Pos, Counter) when Pos == Counter ->
+  CurrentElem;
+retrieveElementR({_CurrentElem, NextElem}, Pos, Counter) ->
+  retrieveElementR(NextElem, Pos, Counter + 1).

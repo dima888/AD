@@ -2,7 +2,12 @@
 %                                              Vorgegebene Schnittstellen der ADT
 %=================================================================================================================================================
 
--module(listeNachSkizze).
+% Die Liste ist ein Tupel, welches aus einem Typidentifier und einer Subliste besteht. Eine Subliste ist
+% wiederum ein Tupel, welches entweder leer ist, um das Ende der Liste zu symbolisieren, oder aus einem
+% beliebigen Element und einer weiteren Subliste besteht. Die Subliste ist also immer wieder in sich
+% geschachtelt, bis das Ende der Liste erreicht ist.
+
+-module(liste).
 
 %% API
 -export([create/0, isEmpty/1, laenge/1, insert/3, delete/2, find/2, retrieve/2, concat/2]).
@@ -61,7 +66,7 @@ delete({liste, Elems}, Pos) ->
 % die der Position des Elements in der Liste entspricht.
 % ***************************************** NACH SKIZZE *****************************************************
 find({liste, Elems}, Elem) ->
-  notImplementedYet.
+  findPosition(Elems, Elem, 1).
 
 %% list × pos → elem
 % ***************************************** NACH SKIZZE *****************************************************
@@ -70,7 +75,7 @@ find({liste, Elems}, Elem) ->
 % von der man das Element zurückgibt.
 % ***************************************** NACH SKIZZE *****************************************************
 retrieve({liste, Elems}, Pos) ->
-  notImplementedYet.
+  retrieveElement(Elems, Pos).
 
 %% list × list → list
 % ***************************************** NACH SKIZZE *****************************************************
@@ -133,22 +138,67 @@ insertElem({First, Second}, Elem, Pos, CurrentPos, Result, _Flag) ->
 %% @param Flag - Ein Flag zum symbolisieren ob das Element an Pos eingefügt wurde
 deleteElem({}, _Pos, _CurrentPos, Result) ->
   createStructure(Result);
-
 deleteElem({_First, Second}, Pos, CurrentPos, Result) when Pos == CurrentPos ->
 %% ***************************************** NACH SKIZZE *****************************************************
 %%  das Element am gewünschten Index ausgelassen und einfach übergangen
 %% ***************************************** NACH SKIZZE *****************************************************
   deleteElem(Second, Pos, CurrentPos + 1, Result);
-
 deleteElem({First, Second}, Pos, CurrentPos, Result) ->
   deleteElem(Second, Pos, CurrentPos + 1, Result ++ [First]).
 
 %% Erezugt aus einer platten Liste (1-Dimensional) die geforderte Struktur
 %% @param ResultList - Die Liste mit den enthaltenen Elementen
 createStructure(ResultList) ->
-  createStructure(lists:reverse(ResultList), {}).
-
+  createStructure(reverseList(ResultList), {}).
 createStructure([], Result) ->
   Result;
 createStructure([H|T], Result) ->
   createStructure(T, {H, Result}).
+
+%% Dreht eine Liste um
+%% @param List - die Liste die verdreht werden soll
+reverseList(List) ->
+  reverseListR(List, []).
+reverseListR([], ReversedList) ->
+  ReversedList;
+reverseListR([H|T], ReversedList) ->
+  reverseListR(T, [H] ++ ReversedList).
+
+%% Sucht die Position des übergebenen Elements in Elems
+%% @param Elems - Die Liste ohne Typ in der gesucht werden soll
+%% @param Elem - Das Element, nach dem gesucht werden soll
+%% @param Counter - Zähler der die Iterationsschritte zählt
+findPosition({}, _Elem, _Counter) ->
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Bei find wird eine unmögliche Position zurückgeben, da die Liste aus Indexen größer also 0 theoretisch
+%% bestehen kann, wäre es eine Zahl die kleiner/gleich 0 ist
+%% ***************************************** NACH SKIZZE *****************************************************
+  -1;
+findPosition({CurrentElem, _NextElem}, Elem, Counter) when CurrentElem == Elem ->
+  Counter;
+findPosition({_CurrentElem, NextElem}, Elem, Counter) ->
+  findPosition(NextElem, Elem, Counter + 1).
+
+retrieveElement(Elems, Pos) ->
+  % Abfrage Ergebnis abspeichern
+  IsPosGreaterThanListLengthOrLessThenZero = (Pos > liste:laenge({liste, Elems})) or (Pos < 1),
+
+  if
+     % Pos > als Listenlänge oder < 1
+     IsPosGreaterThanListLengthOrLessThenZero == true ->
+        %% ***************************************** NACH SKIZZE *****************************************************
+        %% wir haben bei allen aufgeführten Funktionen (bis auf find) dann an eine leeres Objekt gedacht, weil wir da
+        %% der Meinung waren, dass das noch ziemlich oberflächlich ist und nicht zu nah an einer Implementation steht,
+        %% trotzdem jedoch eine eindeutige Angabe ist. Wobei dann die Frage wäre, ob das spezifisch genug ist, oder
+        %% man noch weiter in das Detail gehen soll
+        %% ***************************************** NACH SKIZZE *****************************************************
+        leeresObjekt;
+
+    % Pos <= Listenlänge
+    true ->
+        retrieveElementR(Elems, Pos, 1)
+  end.
+retrieveElementR({CurrentElem, _NextElem}, Pos, Counter) when Pos == Counter ->
+  CurrentElem;
+retrieveElementR({_CurrentElem, NextElem}, Pos, Counter) ->
+  retrieveElementR(NextElem, Pos, Counter + 1).
