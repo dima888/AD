@@ -1,4 +1,3 @@
-% TODO: Für insert, delete und concat eine bessere Lösung finden, als die elemente in eine Liste zu legen, die liste zu reversen und die Struktur zu bauen
 %=================================================================================================================================================
 %                                              Vorgegebene Schnittstellen der ADT
 %=================================================================================================================================================
@@ -79,12 +78,13 @@ retrieve({liste, Elems}, Pos) ->
   retrieveElement(Elems, Pos).
 
 %% list × list → list
-% ***************************************** NACH SKIZZE *****************************************************
+% ***************************************** NICHT NACH SKIZZE *****************************************************
 % Es wird die erste Liste auf einen Iterator geschrieben. Danach wird die zweite Liste mit dem gleichen 
 % Verfahren darüber gesetzt.
-% ***************************************** NACH SKIZZE *****************************************************
+% *** Auf einen Iterator wurde verzichtet, es wurde nur Rekursion verwendet ***
+% ***************************************** NICHT NACH SKIZZE *****************************************************
 concat({liste, Elems1}, {liste, Elems2}) ->
-  concatLists(Elems1, Elems2).
+  {liste, concatLists(Elems1, Elems2)}.
 
 %=================================================================================================================================================
 %                                                       HILFS FUNKTIONEN

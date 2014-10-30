@@ -105,12 +105,12 @@ fillUpArray({array, Liste}, Pos) ->
   FillUpCounter = (Pos - 1) - CurrentLength,
 
   % Nullen auffüllen
-  fillUpArrayR({array, Liste}, FillUpCounter).
+  fillUpArrayR(Liste, FillUpCounter).
 
 % Rekursive Methode um dem übergebenen Array um die Anzahl FillUpCounter Nullen hinzuzufügen
-fillUpArrayR({array, Liste}, 0) ->
+fillUpArrayR(Liste, 0) ->
   {array, Liste};
-fillUpArrayR({array, Liste}, FillUpCounter) ->
+fillUpArrayR(Liste, FillUpCounter) ->
   NewList = liste:create(),
   ListWithZero = liste:insert(NewList, 1, 0),
-  fillUpArrayR(liste:concat({array, Liste}, ListWithZero), FillUpCounter - 1).
+  fillUpArrayR(liste:concat(Liste, ListWithZero), FillUpCounter - 1).
