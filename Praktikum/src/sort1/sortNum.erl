@@ -66,7 +66,7 @@ generateSortNumbersLRHelper(Number, MinNumber, Limit, Path, Result) ->
     Result
   end.
 
-generateSortNumbersRLHelper(Number, 0, Limit, Path, Result) -> Result;
+generateSortNumbersRLHelper(_Number, 0, _Limit, _Path, Result) -> Result;
 generateSortNumbersRLHelper(Number, MaxNumber, Limit, Path, Result) ->
   if (MaxNumber > Limit) ->
     generateSortNumbersRLHelper(Number, MaxNumber - 1, Limit, Path, Result ++ [MaxNumber]);
