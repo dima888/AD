@@ -84,7 +84,7 @@ retrieve({liste, Elems}, Pos) ->
 % *** Auf einen Iterator wurde verzichtet, es wurde nur Rekursion verwendet ***
 % ***************************************** NICHT NACH SKIZZE *****************************************************
 concat({liste, Elems1}, {liste, Elems2}) ->
-  concatLists(Elems1, Elems2).
+  {liste, concatLists(Elems1, Elems2)}.
 
 %=================================================================================================================================================
 %                                                       HILFS FUNKTIONEN

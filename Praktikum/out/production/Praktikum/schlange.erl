@@ -16,12 +16,18 @@
 -export([createQ/0, front/1, enqueue/2, dequeue/1, isEmpty/1]).
 
 %% ∅ → queue
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Erzeugt eine neue Instanz des Tupels mit zwei leeren Stacks (IN & OUT).
+%% ***************************************** NACH SKIZZE *****************************************************
 createQ() ->
   InStack = stack:createS(),
   OutStack = stack:createS(),
   {queue, {InStack, OutStack}}.
 
 %% queue -> elem
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Gibt das erste Element der Queue (--> oberstes Element des Out-Stacks) zurück, ohne es zu entfer- nen.
+%% ***************************************** NACH SKIZZE *****************************************************
 front({queue, {InStack, OutStack}}) ->
   % Ergebnis der Abfrage speichern
   IsOutStackEmpty = stack:isEmptyS(OutStack),
@@ -47,10 +53,16 @@ front({queue, {InStack, OutStack}}) ->
   end.
 
 %% queue x elem -> queue
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Reiht das Element am Ende der Queue ein. D.h., es wird auf dem In-Stack abgelegt.
+%% ***************************************** NACH SKIZZE *****************************************************
 enqueue({queue, {InStack, OutStack}}, Elem) ->
   {queue, {stack:push(InStack, Elem), OutStack}}.
 
 %% queue -> queue
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Entfernt das erste Element der Queue, also das oberste Element des Out-Stacks und gibt sie zurück.
+%% ***************************************** NACH SKIZZE *****************************************************
 dequeue({queue, {InStack, OutStack}}) ->
   % Ergebnis der Abfrage speichern
   IsOutStackEmpty = stack:isEmptyS(OutStack),
@@ -81,6 +93,9 @@ dequeue({queue, {InStack, OutStack}}) ->
   end.
 
 %% queue -> bool
+%% ***************************************** NACH SKIZZE *****************************************************
+%% Prüft, ob sowohl In- und Out-Stack leer sind.
+%% ***************************************** NACH SKIZZE *****************************************************
 isEmpty({queue, {InStack, OutStack}}) ->
   % Falls Instack und Outstack leer sind ist die Queue leer
   stack:isEmptyS(InStack) and stack:isEmptyS(OutStack).
@@ -98,9 +113,6 @@ shiftFromInStackToOutStackR(InStack, OutStack, true) ->
   % Modifizierte Queue zurück geben
   {InStack, OutStack};
 shiftFromInStackToOutStackR(InStack, OutStack, false) ->
-  %io:format("***Anfang*** InStack: ~p~n", [InStack]),
-  %io:format("***Anfang*** OutStack: ~p~n", [OutStack]),
-
   % Ergebnis der Abfrage abspeichern
   IsInStackEmpty = stack:isEmptyS(InStack),
 
@@ -119,9 +131,6 @@ shiftFromInStackToOutStackR(InStack, OutStack, false) ->
 
         % Umverlagertes Element entfernen
         NewInStack = stack:pop(InStack),
-
-        %io:format("***Ende*** NewInStack: ~p~n", [NewInStack]),
-        %io:format("***Ende*** NewOutStack: ~p~n", [NewOutStack]),
 
         % Das oberste Element vom Instack löschen und dem Outstack hinzufügen und weiter Umverlagern
         shiftFromInStackToOutStackR(NewInStack, NewOutStack, false)
