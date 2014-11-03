@@ -32,6 +32,25 @@
 %% @param Integer Bis - Groesster Index Wert vom Array
 insertionS(Array, Von, Bis) ->
 
+  psydoCodeFor(Array, Von, Bis).
 
 
-  todo.
+%=================================================================================================================================================
+%                                                     HILFS FUNKTIONEN
+%=================================================================================================================================================
+psydoCodeFor(Array, I, Bis) when I == Bis -> Array;
+psydoCodeFor(Array, I, Bis) ->
+  Einzusortierender_wert = arrayS:getA(Array, I),
+  J = I,
+
+  [ModifyArray, ModifyJ] = psydoCodeWhile(Array, I, J, Einzusortierender_wert, arrayS:getA(Array, J - 1)),
+
+  ModifyArray2 = arrayS:setA(ModifyArray, ModifyJ, Einzusortierender_wert),
+
+  psydoCodeFor(ModifyArray2, I + 1, Bis).
+
+psydoCodeWhile(Array, I, J, Einzusortierender_wert, JminusEins) when (not( (J > 1) and (JminusEins> Einzusortierender_wert) ) ) -> [Array, J];
+psydoCodeWhile(Array, I, J, Einzusortierender_wert, JminusEins) ->
+  ModifyArray = arrayS:setA(Array, J, JminusEins),
+  ModifyJ = J - 1,
+  psydoCodeWhile(ModifyArray, I, ModifyJ, Einzusortierender_wert, arrayS:getA(ModifyArray, J - 1)).
