@@ -114,3 +114,4 @@ fillUpArrayR(Liste, FillUpCounter) ->
   NewList = liste:create(),
   ListWithZero = liste:insert(NewList, 1, 0),
   fillUpArrayR(liste:concat(Liste, ListWithZero), FillUpCounter - 1).
+

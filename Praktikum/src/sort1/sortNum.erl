@@ -1,5 +1,5 @@
 %%%-------------------------------------------------------------------
-%%% @author foxhound
+%%% @author Team: 4
 %%% @copyright (C) 2014, <COMPANY>
 %%% @doc
 %%%
@@ -31,29 +31,29 @@ generateRandomNumbers(_Number, _From, _Till, _Path, _Modus)  -> modusNichtVorhan
 %=================================================================================================================================================
 %                                                     HILFS FUNKTIONEN
 %=================================================================================================================================================
-random(Number, From, Till, Path) ->
-  NewPath = giveDefaultPath(Path),
+random(Number, From, Till, File) ->
+  NewPath = utility:giveDefaultFile(File),
 
   % Zwei mal, weil bei ersten mal sehr kommische ausgeben herauskommen
   %myIO:writeInNewFile(NewPath, generateRandomNumbersHelper(Number, From, Till, 1, [])),
   %myIO:writeInNewFile(NewPath, generateRandomNumbersHelper(Number, From, Till, 1, [])),
-  myIO:writeInNewFile(NewPath, generateRandomNumbersHelper(Number, From, Till, 1, [])).
+  utility:writeInNewFile(NewPath, generateRandomNumbersHelper(Number, From, Till, 1, [])).
 
-worstCase(Number, From, Till, Path) ->
-  NewPath = giveDefaultPath(Path),
-
-  % Die untere Zeile ist fuer die schoenheitskorrektur
-  %generateRandomNumbersHelper(Number, From, Till, 1, []),
-  %generateRandomNumbersHelper(Number, From, Till, 1, []),
-  myIO:writeInNewFile(NewPath, lists:reverse(lists:sort(generateRandomNumbersHelper(Number, From, Till, 1, [])))).
-
-bestCase(Number, From, Till, Path) ->
-  NewPath = giveDefaultPath(Path),
+worstCase(Number, From, Till, File) ->
+  NewPath = utility:giveDefaultFile(File),
 
   % Die untere Zeile ist fuer die schoenheitskorrektur
   %generateRandomNumbersHelper(Number, From, Till, 1, []),
   %generateRandomNumbersHelper(Number, From, Till, 1, []),
-  myIO:writeInNewFile(NewPath, lists:sort(generateRandomNumbersHelper(Number, From, Till, 1, []))).
+  utility:writeInNewFile(NewPath, lists:reverse(lists:sort(generateRandomNumbersHelper(Number, From, Till, 1, [])))).
+
+bestCase(Number, From, Till, File) ->
+  NewPath = utility:giveDefaultFile(File),
+
+  % Die untere Zeile ist fuer die schoenheitskorrektur
+  %generateRandomNumbersHelper(Number, From, Till, 1, []),
+  %generateRandomNumbersHelper(Number, From, Till, 1, []),
+  utility:writeInNewFile(NewPath, lists:sort(generateRandomNumbersHelper(Number, From, Till, 1, []))).
 
 generateRandomNumbersHelper(Number, From, Till, Counter, Result) ->
   if (Number < Counter) ->
@@ -62,10 +62,5 @@ generateRandomNumbersHelper(Number, From, Till, Counter, Result) ->
     generateRandomNumbersHelper(Number, From, Till, Counter + 1, Result ++ [random:uniform(Till) - (From - 1)])
   end.
 
-%% Gibt ein default Pfad zurueck
-giveDefaultPath(Path) ->
-  if (Path == nil) ->
-    NewPath = "logFiles/sort1/zahlen.dat";
-    true ->
-      NewPath = Path
-  end.
+
+
