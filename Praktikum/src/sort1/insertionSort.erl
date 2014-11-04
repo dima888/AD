@@ -19,6 +19,7 @@
 %%% @end
 %%% Created : 28. Okt 2014 11:38
 %%%-------------------------------------------------------------------
+
 -module(insertionSort).
 -author("foxhound").
 
@@ -31,13 +32,14 @@
 %% @param Integer Von - Kleinster Index Wert vom Array
 %% @param Integer Bis - Groesster Index Wert vom Array
 insertionS(Array, Von, Bis) ->
-
-  psydoCodeFor(Array, Von, Bis).
+  [NewVon, NewBis] = borderCheck(Array, Von, Bis),
+  psydoCodeFor(Array, NewVon, NewBis).
 
 
 %=================================================================================================================================================
 %                                                     HILFS FUNKTIONEN
 %=================================================================================================================================================
+% Aussere Schleife des Alogorithmus
 psydoCodeFor(Array, I, Bis) when I == Bis -> Array;
 psydoCodeFor(Array, I, Bis) ->
   Einzusortierender_wert = arrayS:getA(Array, I),
@@ -49,8 +51,23 @@ psydoCodeFor(Array, I, Bis) ->
 
   psydoCodeFor(ModifyArray2, I + 1, Bis).
 
-psydoCodeWhile(Array, I, J, Einzusortierender_wert, JminusEins) when (not( (J > 1) and (JminusEins> Einzusortierender_wert) ) ) -> [Array, J];
+% Innere Schleife des Algorithmus: Hier muss J > 1 auf J > 0 geaendert werden, da im Psydocode der Index bei 1 beginnt und bei uns bei 0
+psydoCodeWhile(Array, I, J, Einzusortierender_wert, JminusEins) when (not( (J > 0) and (JminusEins > Einzusortierender_wert) ) ) -> [Array, J];
 psydoCodeWhile(Array, I, J, Einzusortierender_wert, JminusEins) ->
   ModifyArray = arrayS:setA(Array, J, JminusEins),
   ModifyJ = J - 1,
-  psydoCodeWhile(ModifyArray, I, ModifyJ, Einzusortierender_wert, arrayS:getA(ModifyArray, J - 1)).
+  psydoCodeWhile(ModifyArray, I, ModifyJ, Einzusortierender_wert, arrayS:getA(ModifyArray, ModifyJ - 1)).
+
+borderCheck(Array, Von, Bis) ->
+  AryLength = arrayS:lengthA(Array),
+
+  if (Von < 0) ->
+     ResultVon = 0,
+    borderCheck(Array, ResultVon, Bis);
+    true ->
+    if (AryLength < Bis) ->
+      [Von + 1, AryLength];
+    true ->
+      [Von + 1, Bis]
+    end
+  end.
