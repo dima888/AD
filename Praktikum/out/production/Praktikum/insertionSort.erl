@@ -1,5 +1,5 @@
 %%%-------------------------------------------------------------------
-%%% @author foxhound
+%%% @author Team: 4
 %%% @copyright (C) 2014, <COMPANY>
 %%% @doc
 %%%
@@ -24,14 +24,17 @@
 -author("foxhound").
 
 %% API
--export([insertionS/3]).
+-export([insertionS/4]).
 
 
-%% Einzige Schnittstelle nach aussen
+
+%% Diese Funtion sortiert ein ArrayS/ADT und speichert die sortierten Daten in Listenformat in eine Datei
 %% @param Array Array - Der zur sortierende Array
 %% @param Integer Von - Kleinster Index Wert vom Array
 %% @param Integer Bis - Groesster Index Wert vom Array
-insertionS(Array, Von, Bis) ->
+%% @param String File - Pfad zur einer Datei, wo das sortierte Ergebnis gespeichert wird
+%% @result [Sortierter Array/ArrayS, Vergleiche/Integer, Verschiebungen/Integer, LaufZeit in Millisekunden/Integer ]
+insertionS(Array, Von, Bis, ResultFile) ->
 
   %% Sortieren und die Zeit messen
   StartTime = utility:getTimestampInMilliSeconds(),
@@ -48,7 +51,7 @@ insertionS(Array, Von, Bis) ->
 
   %% Sortierten Array in sortiert.dat abspeichern in Form einer Liste.
   List = utility:arrayStoList(SortArray),
-  utility:writeInNewFile(sortiert, List),
+  utility:writeInNewFile(ResultFile, List),
 
   [SortArray, CompareCounter, ShiftCounter, RunTime].
 
@@ -117,8 +120,6 @@ psydoCodeWhileWithCounter(Array, I, J, Einzusortierender_wert, JminusEins, Compa
   ModifyJ = J - 1,
   % Verschiebung sowie Vergleiche hochzaehlen
   psydoCodeWhileWithCounter(ModifyArray, I, ModifyJ, Einzusortierender_wert, arrayS:getA(ModifyArray, ModifyJ - 1), CompareCounter + 2, ShiftCounter + 1).
-
-
 
 
 %=================================================================================================================================================
