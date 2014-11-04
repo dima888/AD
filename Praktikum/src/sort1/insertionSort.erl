@@ -21,7 +21,6 @@
 %%%-------------------------------------------------------------------
 
 -module(insertionSort).
--author("foxhound").
 
 %% API
 -export([insertionS/4]).

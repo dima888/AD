@@ -7,7 +7,6 @@
 %%% Created : 28. Okt 2014 16:33
 %%%-------------------------------------------------------------------
 -module(utility).
--author("foxhound").
 
 %% API
 -export([writeInNewFile/2, readFromFile/1, getTimestampInMilliSeconds/0, addListInArrayS/3, arrayStoList/1, giveDefaultFile/1]).

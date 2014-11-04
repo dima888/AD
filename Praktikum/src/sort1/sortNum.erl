@@ -11,7 +11,6 @@
 %%% Created : 28. Okt 2014 11:34
 %%%-------------------------------------------------------------------
 -module(sortNum).
--author("foxhound").
 
 %% API
 -export([generateRandomNumbers/5]).
