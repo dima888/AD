@@ -49,7 +49,7 @@ getTimestampInMilliSeconds() ->
 addListInArrayS(Array, List, AryPositon) ->
   [Head | Tail] = List,
   addListInArrayS(Array, Head, Tail, AryPositon).
-addListInArrayS(Array, _Head, [], _CurrentAryPos) -> Array;
+addListInArrayS(Array, Head, [], CurrentAryPos) -> arrayS:setA(Array, CurrentAryPos, Head);
 addListInArrayS(Array, Head, Tail, CurrentAryPos) ->
   [NewHead | NewTail] = Tail,
   addListInArrayS(arrayS:setA(Array, CurrentAryPos, Head), NewHead, NewTail, CurrentAryPos + 1).

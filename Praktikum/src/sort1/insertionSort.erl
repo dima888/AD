@@ -26,7 +26,6 @@
 -export([insertionS/4]).
 
 
-
 %% Diese Funtion sortiert ein ArrayS/ADT und speichert die sortierten Daten in Listenformat in eine Datei
 %% @param Array Array - Der zur sortierende Array
 %% @param Integer Von - Kleinster Index Wert vom Array
@@ -61,7 +60,7 @@ insertionS(Array, Von, Bis, ResultFile) ->
 %% Das ist der SortierAlgorithmus laut Psydocode
 sort(Array, Von, Bis) ->
   [NewVon, NewBis] = borderCheck(Array, Von, Bis),
-  SortArray = psydoCodeFor(Array, NewVon, NewBis).
+  psydoCodeFor(Array, NewVon, NewBis).
 
 %% Das ist der Sortieralgorithmus, der noch die verschiebungen mit zaehlt
 sortAndCount(Array, Von, Bis) ->
@@ -74,7 +73,7 @@ sortAndCount(Array, Von, Bis) ->
 %=================================================================================================================================================
 % Aussere Schleife des Alogorithmus
 %psydoCodeFor(Array, I, Bis) when I == Bis -> Array;
-psydoCodeFor(Array, I, Bis) when I > Bis -> Array;
+psydoCodeFor(Array, I, Bis) when I >= Bis -> Array;
 psydoCodeFor(Array, I, Bis) ->
   Einzusortierender_wert = arrayS:getA(Array, I),
   J = I,
@@ -93,14 +92,13 @@ psydoCodeWhile(Array, I, J, Einzusortierender_wert, JminusEins) ->
   psydoCodeWhile(ModifyArray, I, ModifyJ, Einzusortierender_wert, arrayS:getA(ModifyArray, ModifyJ - 1)).
 
 
-% TODO: Counter implementieren!!!
 %=================================================================================================================================================
 %                                         Sortieralogorithmus Komponenten mit einem Zaehler fuer die Verschiebungen
 %=================================================================================================================================================
 % Aussere Schleife des Alogorithmus
 psydoCodeForWithCounter(Array, I, Bis) ->
   psydoCodeForWithCounter(Array, I, Bis, 0, 0).
-psydoCodeForWithCounter(_Array, I, Bis, CompareCounter, ShiftCounter) when I > Bis -> [CompareCounter, ShiftCounter];
+psydoCodeForWithCounter(_Array, I, Bis, CompareCounter, ShiftCounter) when I >= Bis -> [CompareCounter, ShiftCounter];
 psydoCodeForWithCounter(Array, I, Bis, CompareCounter, ShiftCounter) ->
   Einzusortierender_wert = arrayS:getA(Array, I),
   J = I,
