@@ -32,33 +32,24 @@ generateRandomNumbers(_Number, _From, _Till, _Path, _Modus)  -> modusNichtVorhan
 %=================================================================================================================================================
 random(Number, From, Till, File) ->
   NewPath = utility:giveDefaultFile(File),
-
-  % Zwei mal, weil bei ersten mal sehr kommische ausgeben herauskommen
-  %myIO:writeInNewFile(NewPath, generateRandomNumbersHelper(Number, From, Till, 1, [])),
-  %myIO:writeInNewFile(NewPath, generateRandomNumbersHelper(Number, From, Till, 1, [])),
   utility:writeInNewFile(NewPath, generateRandomNumbersHelper(Number, From, Till, 1, [])).
 
 worstCase(Number, From, Till, File) ->
   NewPath = utility:giveDefaultFile(File),
-
-  % Die untere Zeile ist fuer die schoenheitskorrektur
-  %generateRandomNumbersHelper(Number, From, Till, 1, []),
-  %generateRandomNumbersHelper(Number, From, Till, 1, []),
   utility:writeInNewFile(NewPath, lists:reverse(lists:sort(generateRandomNumbersHelper(Number, From, Till, 1, [])))).
 
 bestCase(Number, From, Till, File) ->
   NewPath = utility:giveDefaultFile(File),
-
-  % Die untere Zeile ist fuer die schoenheitskorrektur
-  %generateRandomNumbersHelper(Number, From, Till, 1, []),
-  %generateRandomNumbersHelper(Number, From, Till, 1, []),
   utility:writeInNewFile(NewPath, lists:sort(generateRandomNumbersHelper(Number, From, Till, 1, []))).
 
 generateRandomNumbersHelper(Number, From, Till, Counter, Result) ->
   if (Number < Counter) ->
-    Result;
+    % Warum machen wir das? Damit er es nicht als ascii konvertiert!
+    Result ++ [0];
+    %Result;
   true ->
-    generateRandomNumbersHelper(Number, From, Till, Counter + 1, Result ++ [random:uniform(Till) - (From - 1)])
+    %generateRandomNumbersHelper(Number, From, Till, Counter + 1, Result ++ [random:uniform(Till) - (From - 1)])
+    generateRandomNumbersHelper(Number, From, Till, Counter + 1, Result ++ [(random:uniform(Till - From + 1) + From - 1)  ])
   end.
 
 

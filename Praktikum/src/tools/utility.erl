@@ -9,10 +9,11 @@
 -module(utility).
 
 %% API
--export([writeInNewFile/2, readFromFile/1, getTimestampInMilliSeconds/0, addListInArrayS/3, arrayStoList/1, giveDefaultFile/1]).
+-export([writeInNewFile/2, readFromFile/1, getTimestampInMilliSeconds/0, addListInArrayS/3, arrayStoList/1, giveDefaultFile/1
+        , averageValue/1, toString/1, writeInNewFileWithoutDelete/2, writeInNewFileWithoutDeleteWithoutNL/2  ]).
 
 %% Erstellt eine neue Datei, falls eine schon vorhanden ist, wird sie geloescht
-%% @param String Path - Pfad wo die Datei abgelegt werden soll
+%% @param String File - Pfad wo die Datei abgelegt werden soll
 %% @param Object Input - Inhalt der rein geschrieben werden soll
 %% @result ok oder error
 writeInNewFile(File, Input) ->
@@ -20,6 +21,22 @@ writeInNewFile(File, Input) ->
   ModifyInput = lists:flatten(io_lib:format("~p", [Input])),
   file:delete(ModifyFile ),
   {ok, MyFile} = file:open(ModifyFile , [write]),
+  file:write(MyFile, ModifyInput ++ "\n"),
+  file:close(MyFile).
+
+writeInNewFileWithoutDelete(File, Input) ->
+  ModifyFile = giveDefaultFile(File),
+  ModifyInput = lists:flatten(io_lib:format("~p", [Input])),
+
+  {ok, MyFile} = file:open(ModifyFile , [append]),
+  file:write(MyFile, ModifyInput ++ "\n"),
+  file:close(MyFile).
+
+writeInNewFileWithoutDeleteWithoutNL(File, Input) ->
+  ModifyFile = giveDefaultFile(File),
+  ModifyInput = lists:flatten(io_lib:format("~p", [Input])),
+
+  {ok, MyFile} = file:open(ModifyFile , [append]),
   file:write(MyFile, ModifyInput),
   file:close(MyFile).
 
@@ -30,7 +47,8 @@ writeInNewFile(File, Input) ->
 readFromFile(File) ->
   ModifyFile = giveDefaultFile(File),
   {ok, BinaryResult} = file:read_file(ModifyFile),
-  toRealList(binary_to_list(BinaryResult)).
+  ListWithNull = toRealList(binary_to_list(BinaryResult)),
+  lists:delete(lists:last(ListWithNull), ListWithNull).
 
 %=================================================================================================================================================
 %                                                     HILFS FUNKTIONEN
@@ -67,6 +85,28 @@ giveDefaultFile(File) ->
     NewPath = "logFiles/sort1/zahlen.dat";
     (File == sortiert) ->
       NewPath = "logFiles/sort1/sortiert.dat";
+    (File == messung) ->
+      "logFiles/sort1/messung.log";
     true ->
       NewPath = File
   end.
+
+%% Diese Funktion berechnet den Mittelwert!
+averageValue(List) ->
+  [Head | Tail] = List,
+  averageValue(Head, Tail, 0, length(List)).
+averageValue(Head, Tail, AverageValue, Lengh) when Tail == [] -> trunc((AverageValue + Head) / Lengh);
+averageValue(Head, Tail, AverageValue, Length) ->
+  [NewHead | NewTail] = Tail,
+  averageValue(NewHead, NewTail, AverageValue + Head, Length).
+
+
+toString(Object) ->
+  lists:flatten(io_lib:format("~p", [Object])).
+
+
+
+
+
+
+
