@@ -103,16 +103,7 @@ analysis(Algorithmus, RunNumber, File, ElemsSize, [RunTimeList, CompareList, Shi
   MaxShift = lists:max(ShiftList),
 
   showConsoleLog(RunTimeList, CompareList, ShiftList, MinRunTime, MaxRunTime, MinCompare, MaxCompare, MinShift, MaxShift),
-  analysisHelper(Algorithmus, File, RunNumber, ElemsSize, RunTimeList, CompareList, ShiftList, MinRunTime, MaxRunTime, MinCompare, MaxCompare, MinShift, MaxShift),
-
-  X = utility:readFromFile(zahlen),
-  Y = utility:readFromFile(sortiert),
-  io:nl(),
-  io:nl(),
-  io:write(length(X)),
-  io:nl(),
-  io:write(length(Y)).
-
+  analysisHelper(Algorithmus, File, RunNumber, ElemsSize, RunTimeList, CompareList, ShiftList, MinRunTime, MaxRunTime, MinCompare, MaxCompare, MinShift, MaxShift).
 
 %% Speichert die Ausgewerteten Werte in eine log Datei ab
 analysisHelper(Algorithmus, File, RunNumber, ElemsSize, RunTimeList, CompareList, ShiftList, MinRunTime, MaxRunTime, MinCompare, MaxCompare, MinShift, MaxShift) ->
