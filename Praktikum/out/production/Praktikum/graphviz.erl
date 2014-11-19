@@ -1,3 +1,5 @@
+%% Quelle: https://github.com/glejeune/erlang-graphviz/blob/master/src/graphviz.erl
+
 -module(graphviz).
 -export([digraph/1, graph/1, delete/0, add_node/1, add_edge/2, graph_server/1, to_dot/1, to_file/2]).
 
