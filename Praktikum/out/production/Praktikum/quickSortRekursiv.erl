@@ -5,16 +5,27 @@
 %%%
 %%% @end
 %%% Created : 05. Nov 2014 14:49
+%%%
+%%% TODO: Bei I und J wurde die Logik vertauscht !!!
+%%% TODO: Siehe hierfür die Logs nach der Ausführung.
+%%% ArrayWithNumbers = arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(Array, 0, 44), 1, 55), 2, 12), 3, 42), 4, 94), 5, 6), 6, 18), 7, 67).
+%%% ArrayWithNumbers = arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(Array, 0, 12), 1, 9), 2, 17), 3, 8), 4, 7), 5, 11), 6, 2), 7, 3), 8, 5), 9, 10), 10, 18), 11, 15).
+%%% FUNKTIONSTÜCHTIG: ArrayWithNumbers = arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(Array, 0, 3), 1, 1), 2, 4), 3, 2).
+%%%                   ArrayWithNumbers = arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(Array, 0, 3), 1, 1), 2, 4), 3, 2), 4, 7), 5, 9).
 %%%-------------------------------------------------------------------
 -module(quickSortRekursiv).
 -author("Flah").
 
 %% API
--export([quickSortRekursiv/3]).
+-export([quickSortLeftPivot/3]).
+
+quickSortLeftPivot(Links, Rechts, {array, Liste}) ->
+  quickSortRekursiv(Links, Rechts - 1, {array, Liste}).
+
 
 quickSortRekursiv(Links, Rechts, {array, Liste}) ->
-  io:format("Eingabeparameter Quicksort:~nLinks: ~p~nRechts: ~p~nArray: ~p~n", [Links, Rechts, {array, Liste}]),
-  io:nl(),
+  %io:format("Eingabeparameter Quicksort:~nLinks: ~p~nRechts: ~p~nArray: ~p~n", [Links, Rechts, {array, Liste}]),
+  %io:nl(),
 
   if
     Links < Rechts ->
@@ -34,12 +45,12 @@ quickSortRekursiv(Links, Rechts, {array, Liste}) ->
   end.
 
 teileRekursiv(Links, Rechts, Array) ->
-  io:format("Eingabeparameter Teile:~nLinks: ~p~nRechts: ~p~nArray: ~p~n", [Links, Rechts, Array]),
+  io:format("Eingabeparameter Teilefunktion:~nLinks: ~p~nRechts: ~p~nArray: ~p~n", [Links, Rechts, Array]),
   io:nl(),
 
   % Laufvariablen festlegen
   I = Links,
-  J = Rechts - 1, % -1 da ein Array bei Index 0 beginnt
+  J = Rechts,
 
   % starten mit linkestem Element als Pivot
   Pivot = arrayS:getA(Array, Links),
@@ -50,36 +61,50 @@ teileRekursiv(Links, Rechts, Array) ->
   % Solange i nicht an j vorbeigelaufen ist in die Schleife gehen
   [NewI, NewJ, NewArray] = doWhileILesserThanJ(I, J, Pivot, Links, Rechts, Array),
 
-  io:format("Nach Der Schleife:~nI: ~p~nJ: ~p~nPivot: ~p~nArray: ~p~n", [NewI, NewJ, Pivot, Array]),
+  io:format("Nach Der Schleife:~nI: ~p~nJ: ~p~nPivot: ~p~nArray: ~p~n", [NewI, NewJ, Pivot, NewArray]),
   io:nl(),
 
-  %TODO PRÜFEN WAS HIER ABGEHT
   % Tausche Pivotelement (daten[links]) mit neuer endgültiger Position (daten[i])
-  IsElemAtPosILesserThenPivot = arrayS:getA(NewArray, NewI) <  Pivot,
+  IsElemAtPosILesserThenPivot = arrayS:getA(NewArray, NewJ) <  Pivot,
+
+  io:format("Prüfe NewJ(~p) < Pivot(~p): ~p~n", [arrayS:getA(NewArray, NewJ), Pivot, IsElemAtPosILesserThenPivot]),
+  io:nl(),
 
   if
     IsElemAtPosILesserThenPivot ->
       % Element zwischenspeichern
-      OldI = arrayS:getA(NewArray, NewI),
+      OldJ = arrayS:getA(NewArray, NewJ),
 
       % Pivot Element (daten[links] auf neue Position setzten
-      ArrayWithNewPivotPos = arrayS:setA(NewArray, NewI, arrayS:getA(NewArray, Links)),
+      ArrayWithNewPivotPos = arrayS:setA(NewArray, NewJ, arrayS:getA(NewArray, Links)),
 
-      % Altes Element von stelle I auf daten[links] Position setzten
-      ArrayWithSwappedData = arrayS:setA(ArrayWithNewPivotPos, Links, OldI),
+      % Altes Element von stelle J auf daten[links] Position setzten
+      ArrayWithSwappedData = arrayS:setA(ArrayWithNewPivotPos, Links, OldJ),
 
-      [NewI, ArrayWithSwappedData];
+      io:format("Pivot getauscht mit OldI: ~p~n", [IsElemAtPosILesserThenPivot]),
+      io:nl(),
 
-    true -> [NewI, NewArray]
+      [NewJ, ArrayWithSwappedData];
+
+    true -> [NewJ, NewArray]
   end.
 
 
 doWhileILesserThanJ(I, J, Pivot, Links, Rechts, Array) ->
+  io:format("Eingabeparameter DoWhileILesserThan:~nLinks: ~p~nRechts: ~p~nArray: ~p~n", [Links, Rechts, Array]),
+  io:nl(),
+
   % Suche von links ein Element, welches größer als das Pivotelement ist
   NewI = whileDataAtILesserOrEqualPivotAndILesserRigth(I, Pivot, Rechts, Array),
 
+  io:format("NewI: ~p~n", [NewI]),
+  io:nl(),
+
   % Suche von rechts ein Element, welches kleiner als das Pivotelement ist
   NewJ = whileDataAtJGreaterOrEqualPivotAndJGreaterLeft(J, Pivot, Links, Array),
+
+  io:format("NewJ: ~p~n", [NewJ]),
+  io:nl(),
 
   % Solange i an j nicht vorbeigelaufen ist
   if
@@ -94,13 +119,16 @@ doWhileILesserThanJ(I, J, Pivot, Links, Rechts, Array) ->
       % vorherig abgespeichertes Element auf daten[i] setzten
       IAndJSwappedArray = arrayS:setA(IChangedToNewPositionArray, NewI, ElemAtJ),
 
+      io:format("Pos I getauscht mit Pos J: ~p~n", [IAndJSwappedArray]),
+      io:nl(),
+
       % In der Schleife bleiben
       doWhileILesserThanJ(NewI, NewJ, Pivot, Links, Rechts, IAndJSwappedArray);
     true ->
       [NewI, NewJ, Array]
   end.
 
-% Suche von links ein Element, welches größer als das Pivotelement ist
+% wiederhole solange daten[i] ≤ pivot und i < rechts
 whileDataAtILesserOrEqualPivotAndILesserRigth(I, Pivot, Rechts, Array) ->
   % Abfrage Ergebnis abspeichern
   IsDataAtILesserOrEqualPivotAndILesserRigth = (arrayS:getA(Array, I) =< Pivot) and (I < Rechts),
@@ -110,6 +138,7 @@ whileDataAtILesserOrEqualPivotAndILesserRigth(I, Pivot, Rechts, Array) ->
     true -> I
   end.
 
+% wiederhole solange daten[j] ≥ pivot und j > links
 whileDataAtJGreaterOrEqualPivotAndJGreaterLeft(J, Pivot, Links, Array) ->
   % Abfrage Ergebnis abspeichern
   IsDataAtJGreaterOrEqualPivotAndJGreaterLeft = (arrayS:getA(Array, J) >= Pivot) and (J > Links),
