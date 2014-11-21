@@ -5,6 +5,9 @@
 %%%
 %%% @end
 %%% Created : 05. Nov 2014 14:49
+%%%
+%%% TODO: Bei I und J wurde die Logik vertauscht !!!
+%%% TODO: Siehe hierfür die Logs nach der Ausführung.
 %%%-------------------------------------------------------------------
 -module(quickSortRekursiv).
 -author("Flah").
@@ -34,7 +37,7 @@ quickSortRekursiv(Links, Rechts, {array, Liste}) ->
   end.
 
 teileRekursiv(Links, Rechts, Array) ->
-  io:format("Eingabeparameter Teile:~nLinks: ~p~nRechts: ~p~nArray: ~p~n", [Links, Rechts, Array]),
+  io:format("Eingabeparameter Teilefunktion:~nLinks: ~p~nRechts: ~p~nArray: ~p~n", [Links, Rechts, Array]),
   io:nl(),
 
   % Laufvariablen festlegen

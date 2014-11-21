@@ -147,9 +147,9 @@ psydoCodeFuerJedesIvonLinksWithCounter(Array, I, N, Links, Min, CompareCounter, 
   %io:fwrite("( A[i] < A[min] )  => "), io:write(AvonI), io:fwrite(" - "), io:write(AvonMin), io:nl(),
 
   if ( AvonI < AvonMin ) ->
-    psydoCodeFuerJedesIvonLinksWithCounter(Array, I + 1, N, Links, I, CompareCounter + 2, ShiftCounter);
+    psydoCodeFuerJedesIvonLinksWithCounter(Array, I + 1, N, Links, I, CompareCounter + 1, ShiftCounter);
     true ->
-      psydoCodeFuerJedesIvonLinksWithCounter(Array, I + 1, N, Links, Min, CompareCounter + 2, ShiftCounter)
+      psydoCodeFuerJedesIvonLinksWithCounter(Array, I + 1, N, Links, Min, CompareCounter + 1, ShiftCounter)
   end.
 
 

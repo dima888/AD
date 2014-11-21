@@ -1,5 +1,13 @@
 %% Quelle: https://github.com/glejeune/erlang-graphviz/blob/master/src/graphviz.erl
 
+
+%% Beispiel Aufruf!
+% graphviz:graph("G").
+% graphviz:add_edge("A", "B").
+% graphviz:add_edge("B", "C").
+% graphviz:add_edge("B", "D").
+% graphviz:to_file("test2.png", "png").
+
 -module(graphviz).
 -export([digraph/1, graph/1, delete/0, add_node/1, add_edge/2, graph_server/1, to_dot/1, to_file/2]).
 

@@ -50,11 +50,13 @@
 %%                                  - Till -> Groesste Zahl die generiert werden darf
 start(Algorithmus, RunNumber, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]) when Algorithmus == insertionSort ->
   Funktion = fun(Param1, Param2, Param3, Param4) -> insertionSort:insertionS(Param1, Param2, Param3, Param4) end,
-  analysis(Algorithmus, RunNumber, FileMessung, length(utility:readFromFile(FileZahlen)), measurement(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
+  %analysis(Algorithmus, RunNumber, FileMessung, length(utility:readFromFile(FileZahlen)), measurement(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
+  analysis(Algorithmus, RunNumber, FileMessung, FileZahlen, measurement(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
 
 start(Algorithmus, RunNumber, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]) when Algorithmus == selectionSort ->
   Funktion = fun(Param1, Param2, Param3, Param4) -> selectionSort:selectionS(Param1, Param2, Param3, Param4) end,
-  analysis(Algorithmus, RunNumber, FileMessung, length(utility:readFromFile(FileZahlen)), measurement(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
+  %analysis(Algorithmus, RunNumber, FileMessung, length(utility:readFromFile(FileZahlen)), measurement(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
+  analysis(Algorithmus, RunNumber, FileMessung, FileZahlen, measurement(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
 
 start(_Algorithmus, _RunNumber, _FileMessung, _FileZahlen, _FileSortiert, [_Number, _From, _Till]) ->
   algorithmusIstNichtImplementiert.
@@ -109,11 +111,14 @@ analysis(Algorithmus, RunNumber, File, ElemsSize, [RunTimeList, CompareList, Shi
 analysisHelper(Algorithmus, File, RunNumber, ElemsSize, RunTimeList, CompareList, ShiftList, MinRunTime, MaxRunTime, MinCompare, MaxCompare, MinShift, MaxShift) ->
   utility:writeInNewFile(File, Algorithmus),
 
+
+
   utility:writeInNewFileWithoutDeleteWithoutNL(File, "Ausfuehrungen: "),
   utility:writeInNewFileWithoutDelete(File, RunNumber),
 
   utility:writeInNewFileWithoutDeleteWithoutNL(File, "Eingelesene Elemente: "),
-  utility:writeInNewFileWithoutDelete(File, ElemsSize),
+  %utility:writeInNewFileWithoutDelete(File, ElemsSize),
+  utility:writeInNewFileWithoutDelete(File, length(utility:readFromFile(ElemsSize))),
 
   utility:writeInNewFileWithoutDeleteWithoutNL(File, "Mittelwert Rechenzeit in ms: "),
   utility:writeInNewFileWithoutDelete(File, utility:averageValue(RunTimeList)),
