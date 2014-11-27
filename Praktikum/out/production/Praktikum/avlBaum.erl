@@ -61,9 +61,7 @@ einfuegen(Tree, Key) ->
     keyIsRedundant;
   true ->
     ModifyTree = einfuegenHelper(Tree, getRootKey(Tree), Key),
-    %makePicture(ModifyTree, Source, Target, "todo"),
     ResultTree = incrementExecution(ModifyTree),
-  % TODO: Grafik generieren etc.
     makePicture(ResultTree, nil),
     ResultTree
   end.
