@@ -16,24 +16,24 @@
 -author("Flah").
 
 %% API
--export([withFixedPivot/4, withRandomPivot/4]).
+-export([withFixedPivot/5, withRandomPivot/4]).
 
 %================================================================================================================================================
 %                                                           FIXED PIVOT
 %================================================================================================================================================
 
-withFixedPivot(Links, Rechts, {array, Liste}, insertionSort) ->
-  sortWithFixedPivot(Links, Rechts - 1, {array, Liste}, insertionSort);
-withFixedPivot(Links, Rechts, {array, Liste}, selectionSort) ->
-  sortWithFixedPivot(Links, Rechts - 1, {array, Liste}, selectionSort).
+withFixedPivot(Links, Rechts, {array, Liste}, insertionSort, ResultPath) ->
+  sortWithFixedPivot(Links, Rechts - 1, {array, Liste}, insertionSort, ResultPath);
+withFixedPivot(Links, Rechts, {array, Liste}, selectionSort, ResultPath) ->
+  sortWithFixedPivot(Links, Rechts - 1, {array, Liste}, selectionSort, ResultPath).
 
-sortWithFixedPivot(Links, Rechts, {array, Liste}, AlternateAlgo) ->
+sortWithFixedPivot(Links, Rechts, {array, Liste}, AlternateAlgo, ResultPath) ->
   %io:format("Eingabeparameter Quicksort:~nLinks: ~p~nRechts: ~p~nArray: ~p~n", [Links, Rechts, {array, Liste}]),
   %io:nl(),
   if
     (Rechts - Links) < 12 -> if %% TODO MUSS ANGEPASST WERDEN
-                               AlternateAlgo == insertionSort -> insertionSort:insertionS({array, Liste}, Links, Rechts + 1, "PFAD ANGEBEN!");
-                               true -> selectionSort:selectionS({array, Liste}, Links, Rechts + 1, "PFAD ANGEBEN!")
+                               AlternateAlgo == insertionSort -> insertionSort:insertionS(1, {array, Liste}, Links, Rechts + 1, ResultPath);
+                               true -> selectionSort:selectionS({array, Liste}, Links, Rechts + 1, ResultPath)
                              end;
 
     true -> if
@@ -42,16 +42,16 @@ sortWithFixedPivot(Links, Rechts, {array, Liste}, AlternateAlgo) ->
               %io:format("Rückgabe von teileRekursiv:~nTeiler: ~p~nArray: ~p~n", [Teiler, NewArray]),
               %io:nl(),
 
-              NewArray2 = sortWithFixedPivot(Links, Teiler - 1, NewArray, AlternateAlgo),
+              NewArray2 = sortWithFixedPivot(Links, Teiler - 1, NewArray, AlternateAlgo, ResultPath),
               %io:format("Erster Quicksortaufruf Ergebnis: ~p~n", [NewArray2]),
               %io:nl(),
 
-              NewArray3 = sortWithFixedPivot(Teiler + 1, Rechts, NewArray2, AlternateAlgo),
+              NewArray3 = sortWithFixedPivot(Teiler + 1, Rechts, lists:nth(1, NewArray2), AlternateAlgo, ResultPath),
               %io:format("Zweiter Quicksortaufruf Ergebnis: ~p~n", [NewArray3]),
               %io:nl(),
 
               NewArray3;
-            true -> {array, Liste}
+            true -> [{array, Liste}, 5, 5, 5]
 
             end
   end.
