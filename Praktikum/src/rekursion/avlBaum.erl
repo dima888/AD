@@ -86,25 +86,16 @@ linksrotation(Tree, Key, File) ->
   %% Probelem: Der Vorgaenger auf B Zeigt immer noch auf A, der Muss auf B umgebogen werden, sofern der nicht nil ist!
   PredecessorFromB = getPredecessor(Tree, Key),
   if (PredecessorFromB == nil) ->
-    % TODO: Hier ist ein gespenst, der mein counter nicht erhoeht, muss zwei mal aufrufen den kack
-    io:nl(), io:fwrite("ifResult: "), io:write(IfResult), io:nl(),
     ModifyTree6 = sort(IfResult),
-    io:nl(), io:fwrite("Modify 6: "), io:write(ModifyTree6), io:nl(),
     Result = incrementExecution(ModifyTree6),
-    io:nl(), io:fwrite("Result: "), io:write(Result), io:nl(),
     makePicture(Result, File),
     Result;
-    %io:fwrite("fuck you bitch"),
-    %X = incrementExecution(Result),
-    %incrementExecution(X);
   true ->
     %% Pruefen ob wir das linke oder rechte Kind setzten muessen
     ModifyTree5 = checkLeftOrRightSetChildKey(Tree, Key, getPredecessor(Tree, Key), [IfResult, PredecessorFromB, BKey]),
-    %ModifyTree5 = checkLeftOrRightSetChildKey(IfResult, Key, getPredecessor(Tree, Key), [IfResult, PredecessorFromB, BKey]),
     ModifyTree6 = sort(ModifyTree5),
     Result = incrementExecution(ModifyTree6),
     makePicture(Result, File),
-    io:fwrite("fuck you"),
     incrementExecution(Result)
   end.
 
@@ -135,7 +126,6 @@ rechtsrotation(Tree, Key, File) ->
   %% Probelem: Der Vorgaenger auf B Zeigt immer noch auf A, der Muss auf B umgebogen werden, sofern der nicht nil ist!
   PredecessorFromB = getPredecessor(Tree, Key),
   if (PredecessorFromB == nil) ->
-    % TODO: Hier ist ein gespenst, der mein counter nicht erhoeht, muss zwei mal aufrufen den kack
     ModifyTree6 = sort(IfResult),
     Result = incrementExecution(ModifyTree6),
     makePicture(Result, File),
@@ -143,7 +133,6 @@ rechtsrotation(Tree, Key, File) ->
     true ->
       %% Pruefen ob wir das linke oder rechte Kind setzten muessen
       ModifyTree5 = checkLeftOrRightSetChildKey(Tree, Key, getPredecessor(Tree, Key), [IfResult, PredecessorFromB, BKey]),
-      %ModifyTree5 = checkLeftOrRightSetChildKey(IfResult, Key, getPredecessor(Tree, Key), [IfResult, PredecessorFromB, BKey]),
       ModifyTree6 = sort(ModifyTree5),
       Result = incrementExecution(ModifyTree6),
       makePicture(Result, File),
@@ -166,7 +155,6 @@ doppelRechtsrotation(Tree, Key, File) ->
 %=================================================================================================================================================
 %                                                                    Hilfsfunktionen
 %=================================================================================================================================================
-
 %% Ganzer AVL Baum wird rekursiv durchlaufen und ein sortierter Baum zurueck gegeben
 sort(Tree) ->
   [ExecutenCounter, [LeftRotationCounter, RightRotationCounter] | _Rest] = Tree,
@@ -178,13 +166,6 @@ sort(Tree) ->
   [_X, _Y | Nodes] = ModifyTree,
   Res = [ExecutenCounter, [LeftRotationCounter, RightRotationCounter] ] ,
   Res ++ Nodes.
-
-%
-
-%RootKey = getRootKey(Tree),
-%[_, _ | NodeList] = Tree,
-%SortedList = sortHelper(Tree, RootKey, [RootKey], RootKey, RootKey, length(NodeList)),
-
 
 %% RekursionsEnde
 sortHelper(_Tree, _CurrentKey, ResultKeyList, _PredecessorKeyFromCurrentKey, _RootKey, NodeListLength) when length(ResultKeyList) == NodeListLength ->
@@ -247,7 +228,6 @@ insertKey(Tree, Key, File) ->
 
           %% TODO: Pruefen ob der AVL baum ausbalanciert werden muss,
           %% TODO: Wenn ja, dann noch ein Picture machen
-
           ResultTree
       end
   end.
