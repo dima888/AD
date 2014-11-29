@@ -203,6 +203,7 @@ sortHelper(Tree, CurrentKey, ResultKeyList, PredecessorKeyFromCurrentKey, RootKe
       sortHelper(Tree, RightKey, ResultKeyList ++ [RightKey], CurrentKey, RootKey, NodeListLength)
     end;
   true ->
+<<<<<<< HEAD
     sortHelper(Tree, LeftKey, ResultKeyList ++ [LeftKey], CurrentKey, RootKey, NodeListLength)
   end.
 
@@ -214,6 +215,12 @@ checkLeftOrRightSetChildKey(Tree, AKey, PredecessorFromA, [Param1, Param2, Param
     setLeftChildKey(Param1, Param2, Param3);
     true ->
       setRightChildKey(Param1, Param2, Param3)
+=======
+    ModifyTree = einfuegenHelper(Tree, getRootKey(Tree), Key),
+    ResultTree = incrementExecution(ModifyTree),
+    makePicture(ResultTree, nil),
+    ResultTree
+>>>>>>> FETCH_HEAD
   end.
 
 checkOfNil(Elem, _Number) when Elem /= nil -> Elem;
