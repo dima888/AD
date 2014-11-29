@@ -2,11 +2,11 @@ insertionSort
 "Ausfuehrungen: "10
 "Eingelesene Elemente: "100
 "Mittelwert Rechenzeit in ms: "42
-"Mittelwert Vergleiche : "5364
-"Mittelwert Verschiebungen : "2583
-"Minimale Laufzeit: "36
-"Maximale Laufzeit: "51
-"Minimaler Vergleich: "5004
-"Maximaler Vergleich: "5810
-"Minimale Verschiebung: "2403
-"Maximale Verschiebung: "2806
+"Mittelwert Vergleiche : "5194
+"Mittelwert Verschiebungen : "2498
+"Minimale Laufzeit: "33
+"Maximale Laufzeit: "73
+"Minimaler Vergleich: "4406
+"Maximaler Vergleich: "5758
+"Minimale Verschiebung: "2104
+"Maximale Verschiebung: "2780
