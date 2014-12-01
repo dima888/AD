@@ -16,6 +16,7 @@ digraph(Id) ->
   register(graph_server, spawn(?MODULE, graph_server, [{Id, {digraph, "->"}, [] ,[], []}])).
 
 graph(Id) ->
+  timer:sleep(1000),
   register(graph_server, spawn(?MODULE, graph_server, [{Id, {graph, "--"}, [] ,[], []}])).
 
 % -- Destructor

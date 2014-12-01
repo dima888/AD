@@ -142,14 +142,20 @@ rechtsrotation(Tree, Key, File) ->
 %% Diese Funktion implementiert die doppelte Linksrotation
 %% @param avlBaum Tree - Der Baum in den rotiert werden soll
 %% @param Integer Key - Der Vertex um den rotiert werden soll
+%% TODO: Testen X
 doppelLinksrotation(Tree, Key, File) ->
-  todo.
+  BKey = getRightChildKey(Tree, Key),
+  ModifyTree = rechtsrotation(Tree, BKey, File),
+  linksrotation(ModifyTree, Key, File).
 
 %% Diese Funktion implementiert die doppelte Rechtsrotation
 %% @param avlBaum Tree - Der Baum in den rotiert werden soll
 %% @param Integer Key - Der Vertex um den rotiert werden soll
+%% TODO: Testen
 doppelRechtsrotation(Tree, Key, File) ->
-  todo.
+  BKey = getLeftChildKey(Tree, Key),
+  ModifyTree = linksrotation(Tree, BKey, File),
+  rechtsrotation(ModifyTree, Key, File).
 
 
 %=================================================================================================================================================
@@ -324,7 +330,7 @@ listEinfuegenHelper(Tree, Head, [], File) -> einfuegen(Tree, Head, File);
 listEinfuegenHelper(Tree, Head, Tail, File) ->
   ModifyTree = einfuegen(Tree, Head, File),
   % Muss ihn bisschen warten lassen, sonst gibt es Probleme mit graphviz.erl!!!
-  timer:sleep(500),
+  %timer:sleep(1000),
   [ NewHead | NewTail ] = Tail,
   listEinfuegenHelper(ModifyTree, NewHead, NewTail, File).
 
@@ -335,8 +341,6 @@ insertKeyFromListWithoutPicture(Tree, KeyList) ->
 listEinfuegenHelperWithoutPicture(Tree, Head, []) -> einfuegenWithoutPicture(Tree, Head);
 listEinfuegenHelperWithoutPicture(Tree, Head, Tail) ->
   ModifyTree = einfuegenWithoutPicture(Tree, Head),
-  % Muss ihn bisschen warten lassen, sonst gibt es Probleme mit graphviz.erl!!!
-  timer:sleep(500),
   [ NewHead | NewTail ] = Tail,
   listEinfuegenHelperWithoutPicture(ModifyTree, NewHead, NewTail).
 

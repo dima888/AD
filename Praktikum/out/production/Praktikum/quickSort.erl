@@ -11,6 +11,10 @@
 %%% ArrayWithNumbers = arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(Array, 0, 12), 1, 9), 2, 17), 3, 8), 4, 7), 5, 11), 6, 2), 7, 3), 8, 5), 9, 10), 10, 18), 11, 15).
 %%% ArrayWithNumbers = arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(Array, 0, 3), 1, 1), 2, 4), 3, 2).
 %%% ArrayWithNumbers = arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(arrayS:setA(Array, 0, 3), 1, 1), 2, 4), 3, 2), 4, 7), 5, 9).
+
+%%% measurement:start(withFixedPivot, 1, "/Users/Flah/Desktop/messung.log", "/Users/Flah/Desktop/zahlen.dat", "/Users/Flah/Desktop/sortiert.dat", [10000, 0, 10000]).
+
+
 %%%-------------------------------------------------------------------
 -module(quickSort).
 -author("Flah").
