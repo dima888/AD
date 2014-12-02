@@ -33,7 +33,8 @@
 
 % Die unteren muessen raus, sind aus Testzwecken drinne
   getLeftChildKey/2, isAvailable/2, getRootNode/1, setLeftChildKey/3, setRightChildKey/3, getNode/2,
-  getRightChildKey/2, makePicture/2, sort/1, getPredecessor/1, getPredecessor/2, setPredecessor/3, linksrotation/3
+  getRightChildKey/2, makePicture/2, sort/1, getPredecessor/1, getPredecessor/2, setPredecessor/3, linksrotation/3,
+  getMaxDeep/2, toBalanceOut/3
 
 ]).
 
@@ -142,7 +143,6 @@ rechtsrotation(Tree, Key, File) ->
 %% Diese Funktion implementiert die doppelte Linksrotation
 %% @param avlBaum Tree - Der Baum in den rotiert werden soll
 %% @param Integer Key - Der Vertex um den rotiert werden soll
-%% TODO: Testen X
 doppelLinksrotation(Tree, Key, File) ->
   BKey = getRightChildKey(Tree, Key),
   ModifyTree = rechtsrotation(Tree, BKey, File),
@@ -151,7 +151,6 @@ doppelLinksrotation(Tree, Key, File) ->
 %% Diese Funktion implementiert die doppelte Rechtsrotation
 %% @param avlBaum Tree - Der Baum in den rotiert werden soll
 %% @param Integer Key - Der Vertex um den rotiert werden soll
-%% TODO: Testen
 doppelRechtsrotation(Tree, Key, File) ->
   BKey = getLeftChildKey(Tree, Key),
   ModifyTree = linksrotation(Tree, BKey, File),
@@ -161,6 +160,106 @@ doppelRechtsrotation(Tree, Key, File) ->
 %=================================================================================================================================================
 %                                                                    Hilfsfunktionen
 %=================================================================================================================================================
+%% Precondtion bal(v) = h(Tr) – h(Tl) ∈ {-1,0,1}
+%% Funktion ermittelt ob ein Baum die AVL-Bedingung verletzt hat/nicht ausbalanciert ist.
+%% Ganz automatisch balanciert er den Baum wieder mittels der Rotationen aus.
+%% @param AVL-ADT Tree - Die Abstrakte Datenstruktur AVL-Baum
+%% @param Integer Key - Der Schluessel der zuletzt an dem Baum gehaengt wurde,
+%%                      von diesen Key wird geprueft ob die AVL-Bedingung mittels bottom-up verletzt wurde
+toBalanceOut(Tree, Key, File) ->
+
+  % Hier steht ueber welchen Node rotiert werden soll und welche Rotation notwendig sei
+  % Result Example = [ 43, [0, 0] ]
+  % [0, 0] -> Rechtsrotation; [1, 1] -> Linksrotation;
+  % [1, 0] -> Doppelte Rechtsrotation; [0, 1] -> Doppelte Linksrotation
+  [ToRotateKey, RotationCode] = toBalanceOutHelper(Tree, Key, [], getHeight(Tree, Key)),
+
+  io:write(ToRotateKey), io:nl(),
+  io:write(RotationCode), io:nl(),
+
+  if ([0, 0] == RotationCode) ->
+       rechtsrotation(Tree, ToRotateKey, File);
+    ([0, 1] == RotationCode) ->
+       doppelLinksrotation(Tree, ToRotateKey, File);
+    ([1, 0] == RotationCode) ->
+       doppelRechtsrotation(Tree, ToRotateKey, File);
+    ([1, 1] == RotationCode) ->
+      linksrotation(Tree, ToRotateKey, File);
+    true ->
+      Tree
+  end.
+
+toBalanceOutHelper(Tree, Key, DirectionList, FinalDeep) ->
+  ParentKey = getPredecessor(Tree, Key),
+
+  % Abbruchbedingung falls keine Rotation notwendig ist
+  if (ParentKey == nil) ->
+    ["Hund", "Rotation ist  nicht notwendig"];
+  true ->
+
+    % Maximale Tiefe zu gegenueber liegenden Teilbaum
+    MaxDeepFromParentNode_Prototyp = getMaxDeep(Tree, lists:nth(1, getSuitablyChildKey(Tree, ParentKey, Key))),
+
+    % Pruefung falls MaxDeepFromParent 0 ist, heisst wir haben versucht auf nil zuzugreifen und deswegen nehmen wir die Tiefe von seinen Eltern Node
+    if (MaxDeepFromParentNode_Prototyp == 0) ->
+      MaxDeepFromParentNode = getHeight(Tree, ParentKey);
+    true ->
+      MaxDeepFromParentNode = MaxDeepFromParentNode_Prototyp
+    end,
+
+    %% Precondtion bal(v) = h(Tr) – h(Tl) ∈ {-1,0,1}
+    if ( FinalDeep > (MaxDeepFromParentNode + 1) ) ->
+      ResultDirectionList = DirectionList ++ [lists:nth(2,  getSuitablyChildKey(Tree, ParentKey, Key))],
+      [ ParentKey, [lists:nth(length(ResultDirectionList) - 1, ResultDirectionList) , lists:last(ResultDirectionList) ] ];
+    true ->
+     toBalanceOutHelper(Tree, ParentKey, DirectionList ++ [lists:nth(2,  getSuitablyChildKey(Tree, ParentKey, Key))], FinalDeep)
+    end
+
+   end.
+
+%% Funktion gibt das Kind zum Parent Key das != Key ist
+%% Sowie auf welcher Seite der Key von Parent liegt
+%% 1 -> rechts; 0 -> links
+getSuitablyChildKey(Tree, ParentKey, Key) ->
+  ChildKeyLeft = getLeftChildKey(Tree, ParentKey),
+  ChildKeyRight = getRightChildKey(Tree, ParentKey),
+  if (Key == ChildKeyLeft) ->
+    [ChildKeyRight, 0];
+  true ->
+    [ChildKeyLeft, 1]
+  end.
+
+%% Diese Funktion ermittelt die maximale Tiefe die an den Node Key dran haengt
+%% @param AVL-Baum Tree - AVL Baum auf dem gearbeitet wird
+%% @para Integer Key - Schluessel von dem aus nachgeschaut wird
+%% @result - Der tiefste Punkt als Integer Wert
+getMaxDeep(Tree, Key) when Key == nil -> 0;
+getMaxDeep(Tree, Key) ->
+  getMaxDeepHelper(Tree, [Key], [getHeight(Tree, Key)]).
+getMaxDeepHelper(_Tree, [], DeepList) -> lists:max(DeepList);
+getMaxDeepHelper(Tree, KeyList, DeepList) ->
+  Key = lists:nth(1, KeyList),
+  LeftKey = getLeftChildKey(Tree, Key),
+  RightKey = getRightChildKey(Tree, Key),
+  ModifyKeyList = lists:delete(Key, KeyList),
+
+  if (LeftKey == nil) ->
+    ModifyKeyList2 = ModifyKeyList,
+    ModifyDeepList = DeepList;
+   true ->
+     ModifyKeyList2 = ModifyKeyList ++ [LeftKey],
+     ModifyDeepList = DeepList ++ [getHeight(Tree, LeftKey)]
+   end,
+
+  if (RightKey == nil) ->
+    ModifyKeyList3 = ModifyKeyList2,
+    ModifyDeepList2 = ModifyDeepList;
+  true ->
+    ModifyKeyList3 = ModifyKeyList2 ++ [RightKey],
+    ModifyDeepList2 = ModifyDeepList ++ [getHeight(Tree, RightKey)]
+  end,
+  getMaxDeepHelper(Tree, ModifyKeyList3, ModifyDeepList2).
+
 %% Ganzer AVL Baum wird rekursiv durchlaufen und ein sortierter Baum zurueck gegeben
 sort(Tree) ->
   [ExecutenCounter, [LeftRotationCounter, RightRotationCounter] | _Rest] = Tree,
@@ -230,11 +329,13 @@ insertKey(Tree, Key, File) ->
         true ->
           ModifyTree = insertHelper(Tree, getRootKey(Tree), Key),
           ResultTree = incrementExecution(ModifyTree),
-          makePicture(ResultTree, nil),
+          makePicture(ResultTree, File),
 
           %% TODO: Pruefen ob der AVL baum ausbalanciert werden muss,
+          toBalanceOut(ResultTree, Key, File)
+
           %% TODO: Wenn ja, dann noch ein Picture machen
-          ResultTree
+          %ResultTree
       end
   end.
 
@@ -380,10 +481,6 @@ makePictureHelper(Tree, Head, Tail, File, Counter) ->
   [NewHead | NewTail] = Tail,
   makePictureHelper(Tree, NewHead, NewTail, File, Counter + 2).
 
-%% Funktion balanciert einen alvBaum aus
-toBalanceOut(Tree) ->
-  todo.
-
 
 %% Funktion Prueft ob ein Schluessel im Baum enthalten ist!
 %% Wenn ja dann true, sonst false
@@ -482,7 +579,7 @@ getRightChildKey(Tree, Key) ->
   Boolean = isAvailable(Tree, Key),
   getRightChildHelper(Tree, Key, Boolean).
 
-getRightChildHelper(Tree, Key, Bool) when Bool == false -> io:fwirte("key not found"), nil;
+getRightChildHelper(Tree, Key, Bool) when Bool == false -> io:fwrite("key not found"), nil;
 getRightChildHelper(Tree, Key, Bool) ->
   Node = getNode(Tree, Key),
   [_Prefix, _NodeKey, [_LeftKey, RightKey], _Height, _KeyTyp] = Node,
