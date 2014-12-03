@@ -58,12 +58,10 @@ start(Algorithmus, RunNumber, FileMessung, FileZahlen, FileSortiert, [Number, Fr
   %analysis(Algorithmus, RunNumber, FileMessung, length(utility:readFromFile(FileZahlen)), measurement(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
   analysis(Algorithmus, RunNumber, FileMessung, FileZahlen, measurement(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
 
-%TODO NEU
 start(Algorithmus, RunNumber, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]) when Algorithmus == withFixedPivot ->
   Funktion = fun(Param1, Param2, Param3, Param4, Param5) -> quickSort:withFixedPivot(Param1, Param2, Param3, Param4, Param5) end,
   analysis(Algorithmus, RunNumber, FileMessung, FileZahlen, measurementQuicksort(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
 
-%TODO NEU
 start(Algorithmus, RunNumber, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]) when Algorithmus == withRandomPivot ->
   Funktion = fun(Param1, Param2, Param3, Param4, Param5) -> quickSort:withRandomPivot(Param1, Param2, Param3, Param4, Param5) end,
   analysis(Algorithmus, RunNumber, FileMessung, FileZahlen, measurementQuicksort(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
@@ -122,7 +120,7 @@ initialAndExecuteMeasurementQuicksort(Algorithmus, RunNumber, RunTimeList, Compa
   sortNum:generateRandomNumbers(Number, From, Till, FileZahlen, Modus),
   List = utility:readFromFile(FileZahlen),
   ArrayS = utility:addListInArrayS(InitialArray, List, 0),
-  [_SortArray, CompareCounter, ShiftCounter, RunTime] = Algorithmus(0, arrayS:lengthA(ArrayS), ArrayS, selectionSort, FileSortiert),
+  [_SortArray, CompareCounter, ShiftCounter, RunTime] = Algorithmus(0, arrayS:lengthA(ArrayS), ArrayS, selectionSort, FileSortiert), %TODO anpassen
   measurementQuicksort(Algorithmus, RunNumber, RunTimeList ++ [RunTime], CompareList ++ [CompareCounter], ShiftList ++ [ShiftCounter], Counter + 1, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]).
 
 
