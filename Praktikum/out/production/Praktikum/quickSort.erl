@@ -490,9 +490,10 @@ whileDataAtJGreaterOrEqualPivotAndJGreaterLefWithCounters(J, Pivot, Links, Array
     true -> [J, CompareCounter, ShiftCounter]
   end.
 
+generateRandomNumber(0, _Max) ->
+  0;
 generateRandomNumber(Min, Max) ->
   generateRandomNumber(Min, Max, random:uniform(Min) + Min).
-
 generateRandomNumber(Min, Max, Number) when (Number > Max) or (Number < Min) ->
   generateRandomNumber(Min, Max);
 generateRandomNumber(_Min, _Max, Number) ->

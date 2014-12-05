@@ -38,7 +38,7 @@
 -module(measurement).
 
 %% API
--export([start/6]).
+-export([start/6, start/7]).
 
 %% @param Atom Algorithmus - insertionSort oder selectionSort sind die moeglichen Eingaben
 %% @param Integer RunNumber - Wie oft der Algorithmus ausgefuehrt werden soll
@@ -58,17 +58,18 @@ start(Algorithmus, RunNumber, FileMessung, FileZahlen, FileSortiert, [Number, Fr
   %analysis(Algorithmus, RunNumber, FileMessung, length(utility:readFromFile(FileZahlen)), measurement(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
   analysis(Algorithmus, RunNumber, FileMessung, FileZahlen, measurement(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
 
-%TODO NEU
-start(Algorithmus, RunNumber, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]) when Algorithmus == withFixedPivot ->
-  Funktion = fun(Param1, Param2, Param3, Param4, Param5) -> quickSort:withFixedPivot(Param1, Param2, Param3, Param4, Param5) end,
-  analysis(Algorithmus, RunNumber, FileMessung, FileZahlen, measurementQuicksort(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
-
-%TODO NEU
-start(Algorithmus, RunNumber, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]) when Algorithmus == withRandomPivot ->
-  Funktion = fun(Param1, Param2, Param3, Param4, Param5) -> quickSort:withRandomPivot(Param1, Param2, Param3, Param4, Param5) end,
-  analysis(Algorithmus, RunNumber, FileMessung, FileZahlen, measurementQuicksort(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]));
-
 start(_Algorithmus, _RunNumber, _FileMessung, _FileZahlen, _FileSortiert, [_Number, _From, _Till]) ->
+  algorithmusIstNichtImplementiert.
+
+start(Algorithmus, RunNumber, FileMessung, FileZahlen, FileSortiert, [Number, From, Till], Modus) when Algorithmus == withFixedPivot ->
+  Funktion = fun(Param1, Param2, Param3, Param4, Param5) -> quickSort:withFixedPivot(Param1, Param2, Param3, Param4, Param5) end,
+  analysis(Algorithmus, RunNumber, FileMessung, FileZahlen, measurementQuicksort(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till], Modus));
+
+start(Algorithmus, RunNumber, FileMessung, FileZahlen, FileSortiert, [Number, From, Till], Modus) when Algorithmus == withRandomPivot ->
+  Funktion = fun(Param1, Param2, Param3, Param4, Param5) -> quickSort:withRandomPivot(Param1, Param2, Param3, Param4, Param5) end,
+  analysis(Algorithmus, RunNumber, FileMessung, FileZahlen, measurementQuicksort(Funktion, RunNumber, [], [], [], 0, FileMessung, FileZahlen, FileSortiert, [Number, From, Till], Modus));
+
+start(_Algorithmus, _RunNumber, _FileMessung, _FileZahlen, _FileSortiert, [_Number, _From, _Till], _Modus) ->
   algorithmusIstNichtImplementiert.
 
 
@@ -90,18 +91,18 @@ measurement(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter
   initialAndExecuteMeasurement(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till, random]).
 
 % FÜR QUICKSORT
-measurementQuicksort(_Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, _FileMessung, _FileZahlen, _FileSortiert, [_Number, _From, _Till]) when Counter >= RunNumber -> [RunTimeList, CompareList, ShiftList];
-measurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]) when (Counter > 80) and (Counter < 90) ->
+measurementQuicksort(_Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, _FileMessung, _FileZahlen, _FileSortiert, [_Number, _From, _Till], _ModusQuicksort) when Counter >= RunNumber -> [RunTimeList, CompareList, ShiftList];
+measurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till], ModusQuicksort) when (Counter > 80) and (Counter < 90) ->
   io:nl(), io:fwrite("------- bestCase --------"), io:nl(),
-  initialAndExecuteMeasurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till, bestCase]);
+  initialAndExecuteMeasurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till, bestCase], ModusQuicksort);
 
-measurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]) when (Counter > 90) and (Counter < 100) ->
+measurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till], ModusQuicksort) when (Counter > 90) and (Counter < 100) ->
   io:nl(), io:fwrite("------- worstCase --------"), io:nl(),
-  initialAndExecuteMeasurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till, worstCase]);
+  initialAndExecuteMeasurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till, worstCase], ModusQuicksort);
 
-measurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]) ->
+measurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till], ModusQuicksort) ->
   io:nl(), io:fwrite("------- random --------"), io:nl(),
-  initialAndExecuteMeasurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till, random]).
+  initialAndExecuteMeasurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till, random], ModusQuicksort).
 
 %% Initialisiert ein arrayS, generiert zufallszahlen,
 %% befuhlt den array, sortiert den array und speichert das
@@ -112,18 +113,18 @@ initialAndExecuteMeasurement(Algorithmus, RunNumber, RunTimeList, CompareList, S
   List = utility:readFromFile(FileZahlen),
   ArrayS = utility:addListInArrayS(InitialArray, List, 0),
   [_SortArray, CompareCounter, ShiftCounter, RunTime] = Algorithmus(ArrayS, 0, arrayS:lengthA(ArrayS), FileSortiert),
-  measurementQuicksort(Algorithmus, RunNumber, RunTimeList ++ [RunTime], CompareList ++ [CompareCounter], ShiftList ++ [ShiftCounter], Counter + 1, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]).
+  measurement(Algorithmus, RunNumber, RunTimeList ++ [RunTime], CompareList ++ [CompareCounter], ShiftList ++ [ShiftCounter], Counter + 1, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]).
 
 %% Initialisiert ein arrayS, generiert zufallszahlen,
 %% befuhlt den array, sortiert den array und speichert das
 %% sortierte array in eine datei FileSort.
-initialAndExecuteMeasurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till, Modus]) ->
+initialAndExecuteMeasurementQuicksort(Algorithmus, RunNumber, RunTimeList, CompareList, ShiftList, Counter, FileMessung, FileZahlen, FileSortiert, [Number, From, Till, Modus], ModusQuicksort) ->
   InitialArray = arrayS:initA(),
   sortNum:generateRandomNumbers(Number, From, Till, FileZahlen, Modus),
   List = utility:readFromFile(FileZahlen),
   ArrayS = utility:addListInArrayS(InitialArray, List, 0),
-  [_SortArray, CompareCounter, ShiftCounter, RunTime] = Algorithmus(0, arrayS:lengthA(ArrayS), ArrayS, selectionSort, FileSortiert),
-  measurementQuicksort(Algorithmus, RunNumber, RunTimeList ++ [RunTime], CompareList ++ [CompareCounter], ShiftList ++ [ShiftCounter], Counter + 1, FileMessung, FileZahlen, FileSortiert, [Number, From, Till]).
+  [_SortArray, CompareCounter, ShiftCounter, RunTime] = Algorithmus(0, arrayS:lengthA(ArrayS), ArrayS, ModusQuicksort, FileSortiert), %TODO anpassen
+  measurementQuicksort(Algorithmus, RunNumber, RunTimeList ++ [RunTime], CompareList ++ [CompareCounter], ShiftList ++ [ShiftCounter], Counter + 1, FileMessung, FileZahlen, FileSortiert, [Number, From, Till], ModusQuicksort).
 
 
 %% Diese Funktion ist fuer das auswerten der gesamten Daten zustaendig
