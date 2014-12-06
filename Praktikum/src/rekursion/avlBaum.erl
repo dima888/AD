@@ -29,12 +29,12 @@
 -module(avlBaum).
 
 %% API
--export([init/0, einfuegen/3, loeschen/3, linksrotation/3, rechtsrotation/3, doppelLinksrotation/3, doppelRechtsrotation/3,
+-export([init/0, einfuegen/3, loeschen/3, linksrotation/3, rechtsrotation/3, doppelLinksrotation/3, doppelRechtsrotation/3
 
 % Die unteren muessen raus, sind aus Testzwecken drinne
-  getLeftChildKey/2, isAvailable/2, getRootNode/1, setLeftChildKey/3, setRightChildKey/3, getNode/2,
-  getRightChildKey/2, makePicture/2, sort/1, getPredecessor/1, getPredecessor/2, setPredecessor/3, linksrotation/3,
-  getMaxDeep/2, toBalanceOut/3
+  %,getLeftChildKey/2, isAvailable/2, getRootNode/1, setLeftChildKey/3, setRightChildKey/3, getNode/2,
+  %getRightChildKey/2, makePicture/2, sort/1, getPredecessor/1, getPredecessor/2, setPredecessor/3, linksrotation/3,
+  %getMaxDeep/2, toBalanceOut/3
 
 ]).
 
@@ -46,7 +46,6 @@ init() ->
 %% @param avlBaum Tree - Die Datenstruktur des AVL Baumes
 %% @param String Key v List Liste von Keys - Das neu hinzugefuegte Element
 %% Extra: File == nil -> "/Users/foxhound/Desktop/avlBaum/"
-% TODO: Pruefung fuer die ausbalancierung einbauen
 einfuegen(Tree, Key, File) when is_integer(Key) == true -> io:fwrite("Create Picture and add Node with Key: " ), io:write(Key), io:nl(), insertKey(Tree, Key, File);
 einfuegen(Tree, Key, File) when is_list(Key) == true -> insertKeyFromList(Tree, Key, File);
 einfuegen(_Tree, _Key, _File) -> schluesselIstKeinLegitimerWert.
@@ -56,7 +55,7 @@ einfuegen(_Tree, _Key, _File) -> schluesselIstKeinLegitimerWert.
 %% @param Integer Key - Der zu entfernende Schluessel
 %% @return avlBaum - Der modifizierte Baum
 loeschen(Tree, Key, File) ->
-  todo.
+  loeschenHelper(Tree, Key, File, getLeftChildKey(Tree, Key), getRightChildKey(Tree, Key)).
 
 %% Implementation ohne Preconditions!!!
 %% Diese Funktion implementiert die einfache Linksrotation
@@ -80,7 +79,6 @@ linksrotation(Tree, Key, File) ->
     IfResult;
   true ->
     ModifyTree4 = setRightChildKey(ModifyTree3, Key, L2Key),
-    %IfResult = setPredecessor(ModifyTree4, L2Key, getPredecessor(ModifyTree4, Key))
     IfResult = setPredecessor(ModifyTree4, L2Key, Key)
   end,
 
@@ -90,14 +88,17 @@ linksrotation(Tree, Key, File) ->
     ModifyTree6 = sort(IfResult),
     Result = incrementExecution(ModifyTree6),
     makePicture(Result, File),
-    Result;
+    [X, [LRotationen, RRotationen] | Rest] = Result,
+    [X, [LRotationen + 1, RRotationen] | Rest];
   true ->
     %% Pruefen ob wir das linke oder rechte Kind setzten muessen
     ModifyTree5 = checkLeftOrRightSetChildKey(Tree, Key, getPredecessor(Tree, Key), [IfResult, PredecessorFromB, BKey]),
     ModifyTree6 = sort(ModifyTree5),
     Result = incrementExecution(ModifyTree6),
     makePicture(Result, File),
-    incrementExecution(Result)
+    incrementExecution(Result),
+    [X, [LRotationen, RRotationen] | Rest] = Result,
+    [X, [LRotationen + 1, RRotationen] | Rest]
   end.
 
 %% Diese Funktion implementiert die einfache Rechtsrotation
@@ -130,36 +131,159 @@ rechtsrotation(Tree, Key, File) ->
     ModifyTree6 = sort(IfResult),
     Result = incrementExecution(ModifyTree6),
     makePicture(Result, File),
-    incrementExecution(Result);
+
+    incrementExecution(Result),
+    [X, [LRotationen, RRotationen] | Rest] = Result,
+    [X, [LRotationen, RRotationen + 1] | Rest];
     true ->
       %% Pruefen ob wir das linke oder rechte Kind setzten muessen
       ModifyTree5 = checkLeftOrRightSetChildKey(Tree, Key, getPredecessor(Tree, Key), [IfResult, PredecessorFromB, BKey]),
       ModifyTree6 = sort(ModifyTree5),
       Result = incrementExecution(ModifyTree6),
       makePicture(Result, File),
-      Result
+      Result,
+      [X, [LRotationen, RRotationen] | Rest] = Result,
+      [X, [LRotationen, RRotationen + 1] | Rest]
   end.
 
 %% Diese Funktion implementiert die doppelte Linksrotation
 %% @param avlBaum Tree - Der Baum in den rotiert werden soll
 %% @param Integer Key - Der Vertex um den rotiert werden soll
 doppelLinksrotation(Tree, Key, File) ->
+  io:fwrite("------------------------------------------------------------------------------" ), io:nl(),
+  io:fwrite("Doppelte Linksrotation um Key: " ), io:write(Key), io:nl(),
   BKey = getRightChildKey(Tree, Key),
   ModifyTree = rechtsrotation(Tree, BKey, File),
-  linksrotation(ModifyTree, Key, File).
+  ResultTree = linksrotation(ModifyTree, Key, File),
+  io:fwrite("------------------------------------------------------------------------------" ), io:nl(),
+  ResultTree.
 
 %% Diese Funktion implementiert die doppelte Rechtsrotation
 %% @param avlBaum Tree - Der Baum in den rotiert werden soll
 %% @param Integer Key - Der Vertex um den rotiert werden soll
 doppelRechtsrotation(Tree, Key, File) ->
+  io:fwrite("------------------------------------------------------------------------------" ), io:nl(),
+  io:fwrite("Doppelte Rechtsrotation um Key: " ), io:write(Key), io:nl(),
   BKey = getLeftChildKey(Tree, Key),
   ModifyTree = linksrotation(Tree, BKey, File),
-  rechtsrotation(ModifyTree, Key, File).
+  ResultTree = rechtsrotation(ModifyTree, Key, File),
+  io:fwrite("------------------------------------------------------------------------------" ), io:nl(),
+  ResultTree.
 
 
 %=================================================================================================================================================
 %                                                                    Hilfsfunktionen
 %=================================================================================================================================================
+%% Erste Variante!!!!!!
+loeschenHelper(Tree, Key, File, LeftChildKey, RightChildKey) when ((LeftChildKey == nil) and (RightChildKey == nil)) ->
+  io:fwrite("Erste Variante"), io:nl(),
+  Predecessor = getPredecessor(Tree, Key),
+  if (Predecessor == nil) ->
+    [X, Y | _Rest] = Tree,
+    Result = [X + 1, Y],
+    Result;
+    true ->
+      [X, Y | NodeList] = Tree,
+      ModifyNodeList = [ X || X <- NodeList, Key /= getKey(X) ],
+      Result = sort([X + 1, Y] ++ ModifyNodeList),
+      makePicture(Result, File),
+      Result
+  end;
+%% Zweite Variante
+loeschenHelper(Tree, Key, File, LeftChildKey, RightChildKey) when ( (LeftChildKey == nil) and (RightChildKey /= nil) or ( (LeftChildKey /= nil) and (RightChildKey == nil)) ) ->
+  %% Position: 1 -> rechts; 0 -> links
+  [ _WhatEver, Position ] = getSuitablyChildKey(Tree, getPredecessor(Tree, Key), Key),
+
+  %% Sonder Fall, falls Root geloescht werden mag
+  SeperatCaseKey = getPredecessor(Tree, Key),
+
+  %% if(true) -> Root Node erkannt
+  if (SeperatCaseKey == nil) ->
+    [ Part1, Part2 | NodeList ]= Tree,
+    ModifyNodeList = [ X || X <- NodeList, lists:nth(2, X) /= Key ],
+    ModifyTree = [Part1, Part2] ++ ModifyNodeList,
+
+    % Richtige Seite ermitteln
+    if (LeftChildKey == nil) ->
+      ResultF = setPredecessor(ModifyTree, getRightChildKey(Tree, Key), nil);
+      true ->
+        ResultF = setPredecessor(ModifyTree, getLeftChildKey(Tree, Key), nil)
+    end,
+    ResultE = sort(ResultF),
+    Result = incrementExecution(ResultE),
+    makePicture(Result, File),
+    Result;
+
+    true ->
+      % Parent Node von Key herausziehen und vorbereiten
+      ParentKey = getPredecessor(Tree, Key),
+      ParentNode = getNode(Tree, ParentKey),
+      [PrefixX, KeyX, [LeftChildX, RightChildX], HeightX, PredecessorX] = ParentNode,
+
+      if (LeftChildKey == nil) ->
+        % Child von Parent neuen Key referenzieren
+        if (Position == 0) ->
+          ModifyParentNode = [PrefixX, KeyX, [RightChildKey, RightChildX], HeightX, PredecessorX];
+          true ->
+            ModifyParentNode = [PrefixX, KeyX, [LeftChildX, RightChildKey], HeightX, PredecessorX]
+        end;
+        true ->
+          % Child von Parent neuen Key referenzieren
+          if (Position == 0) ->
+            ModifyParentNode = [PrefixX, KeyX, [LeftChildKey, RightChildX], HeightX, PredecessorX];
+            true ->
+              ModifyParentNode = [PrefixX, KeyX, [LeftChildX, LeftChildKey], HeightX, PredecessorX]
+          end
+      end,
+
+      % Das alte Key-Node Element muss rausgeworfen werden
+      [ Part1, Part2 | NodeList ]= Tree,
+      ModifyNodeList = [ X || X <- NodeList, lists:nth(2, X) /= Key ],
+
+      ModifyTree = nodeInserter(ModifyNodeList, ParentKey, ModifyParentNode, [], Part1, Part2),
+      ResultF = sort(ModifyTree),
+      Result = incrementExecution(ResultF),
+      makePicture(Result, File),
+      Result
+  end;
+%% Dritte Variante
+loeschenHelper(Tree, Key, File, LeftChildKey, RightChildKey) when (LeftChildKey /= nil) and (RightChildKey /= nil) ->
+  % Maximalen Knoten in linken Teilbaum hollen
+  MaxKey = getMaximumKey(Tree, Key),
+  KeyNode = getNode(Tree, Key),
+  [ Part1, Part2 | NodeList ]= Tree,
+  [PrefixX, _KeyX, [LeftChildX, RightChildX], HeightX, PredecessorX] = KeyNode,
+  ModifyKeyNode = [PrefixX, MaxKey, [LeftChildX, RightChildX], HeightX, PredecessorX],
+  ModifyNodeList = [ X || X <- NodeList, lists:nth(2, X) /= MaxKey ],
+  ModifyTree = nodeInserter(ModifyNodeList, Key, ModifyKeyNode, [], Part1, Part2),
+
+  % Precondition Falls das zu loeschende Element kein Root Knoten ist
+  ParentKey = getPredecessor(Tree, Key),
+  %% Position: 1 -> rechts; 0 -> links
+  [ _WhatEver, Position ] = getSuitablyChildKey(Tree, ParentKey, Key),
+
+  if (ParentKey /= nil) ->
+    %In diesen Fall muss der Vorgaenger auf den neuen Knoten zeigen!
+    %Child von Parent neuen Key referenzieren
+    if (Position == 0) ->
+      ModifyTree2 = setLeftChildKey(ModifyTree, ParentKey, MaxKey);
+      true ->
+        ModifyTree2 = setRightChildKey(ModifyTree, ParentKey, MaxKey)
+    end;
+    true ->
+      % Referenzen umbiegen
+      ParentFromMaxKey = getPredecessor(Tree, MaxKey),
+      ModifyTreeTODO = setRightChildKey(ModifyTree, ParentFromMaxKey, nil),
+      ModifyTree2 = setPredecessor(ModifyTreeTODO, ParentFromMaxKey, MaxKey),
+      ModifyTree2
+  end,
+  ResultF = incrementExecution(ModifyTree2),
+  Result = sort(ResultF),
+  makePicture(Result, File),
+  Result;
+loeschenHelper(_Tree, _Key, _File, _LeftChildKey, _RightChildKey) ->
+  soEinFallExestiertNichtERROR_ERROR_ERROR_ERROR_ERROR_ERROR_ERROR_ERROR_ERROR.
+
 %% Precondtion bal(v) = h(Tr) – h(Tl) ∈ {-1,0,1}
 %% Funktion ermittelt ob ein Baum die AVL-Bedingung verletzt hat/nicht ausbalanciert ist.
 %% Ganz automatisch balanciert er den Baum wieder mittels der Rotationen aus.
@@ -173,9 +297,6 @@ toBalanceOut(Tree, Key, File) ->
   % [0, 0] -> Rechtsrotation; [1, 1] -> Linksrotation;
   % [1, 0] -> Doppelte Rechtsrotation; [0, 1] -> Doppelte Linksrotation
   [ToRotateKey, RotationCode] = toBalanceOutHelper(Tree, Key, [], getHeight(Tree, Key)),
-
-  io:write(ToRotateKey), io:nl(),
-  io:write(RotationCode), io:nl(),
 
   if ([0, 0] == RotationCode) ->
        rechtsrotation(Tree, ToRotateKey, File);
@@ -216,49 +337,6 @@ toBalanceOutHelper(Tree, Key, DirectionList, FinalDeep) ->
     end
 
    end.
-
-%% Funktion gibt das Kind zum Parent Key das != Key ist
-%% Sowie auf welcher Seite der Key von Parent liegt
-%% 1 -> rechts; 0 -> links
-getSuitablyChildKey(Tree, ParentKey, Key) ->
-  ChildKeyLeft = getLeftChildKey(Tree, ParentKey),
-  ChildKeyRight = getRightChildKey(Tree, ParentKey),
-  if (Key == ChildKeyLeft) ->
-    [ChildKeyRight, 0];
-  true ->
-    [ChildKeyLeft, 1]
-  end.
-
-%% Diese Funktion ermittelt die maximale Tiefe die an den Node Key dran haengt
-%% @param AVL-Baum Tree - AVL Baum auf dem gearbeitet wird
-%% @para Integer Key - Schluessel von dem aus nachgeschaut wird
-%% @result - Der tiefste Punkt als Integer Wert
-getMaxDeep(Tree, Key) when Key == nil -> 0;
-getMaxDeep(Tree, Key) ->
-  getMaxDeepHelper(Tree, [Key], [getHeight(Tree, Key)]).
-getMaxDeepHelper(_Tree, [], DeepList) -> lists:max(DeepList);
-getMaxDeepHelper(Tree, KeyList, DeepList) ->
-  Key = lists:nth(1, KeyList),
-  LeftKey = getLeftChildKey(Tree, Key),
-  RightKey = getRightChildKey(Tree, Key),
-  ModifyKeyList = lists:delete(Key, KeyList),
-
-  if (LeftKey == nil) ->
-    ModifyKeyList2 = ModifyKeyList,
-    ModifyDeepList = DeepList;
-   true ->
-     ModifyKeyList2 = ModifyKeyList ++ [LeftKey],
-     ModifyDeepList = DeepList ++ [getHeight(Tree, LeftKey)]
-   end,
-
-  if (RightKey == nil) ->
-    ModifyKeyList3 = ModifyKeyList2,
-    ModifyDeepList2 = ModifyDeepList;
-  true ->
-    ModifyKeyList3 = ModifyKeyList2 ++ [RightKey],
-    ModifyDeepList2 = ModifyDeepList ++ [getHeight(Tree, RightKey)]
-  end,
-  getMaxDeepHelper(Tree, ModifyKeyList3, ModifyDeepList2).
 
 %% Ganzer AVL Baum wird rekursiv durchlaufen und ein sortierter Baum zurueck gegeben
 sort(Tree) ->
@@ -313,7 +391,6 @@ einfuegenWithoutPicture(_Tree, _Key) -> schluesselIstKeinLegitimerWert.
 
 %% Diese Funktion ist fuer das hinzufuegen von Schluesseln in die ADT verantwortlich
 insertKey(Tree, Key, File) ->
-
   %% Pruefung, falls der Baum noch leer ist
   if (Tree == [ 0, [0, 0] ]) ->
     RootNode = [node, Key, [nil, nil], 1, nil],
@@ -330,18 +407,13 @@ insertKey(Tree, Key, File) ->
           ModifyTree = insertHelper(Tree, getRootKey(Tree), Key),
           ResultTree = incrementExecution(ModifyTree),
           makePicture(ResultTree, File),
-
-          %% TODO: Pruefen ob der AVL baum ausbalanciert werden muss,
+          %% Pruefen ob der AVL baum ausbalanciert werden muss,
           toBalanceOut(ResultTree, Key, File)
-
-          %% TODO: Wenn ja, dann noch ein Picture machen
-          %ResultTree
       end
   end.
 
 %% Diese Funktion ist fuer das hinzufuegen von Schluesseln in die ADT verantwortlich
 insertKeyWithoutPicture(Tree, Key) ->
-
   %% Pruefung, falls der Baum noch leer ist
   if (Tree == [ 0, [0, 0] ]) ->
     RootNode = [node, Key, [nil, nil], 1, nil],
@@ -356,9 +428,8 @@ insertKeyWithoutPicture(Tree, Key) ->
           ModifyTree = insertHelper(Tree, getRootKey(Tree), Key),
           ResultTree = incrementExecution(ModifyTree),
 
-          %% TODO: Pruefen ob der AVL baum ausbalanciert werden muss,
-          %% TODO: Wenn ja, dann noch ein Picture machen
-
+          %% Pruefen ob der AVL baum ausbalanciert werden muss,
+          %toBalanceOut(ResultTree, Key, "")
           ResultTree
       end
   end.
@@ -445,10 +516,6 @@ listEinfuegenHelperWithoutPicture(Tree, Head, Tail) ->
   [ NewHead | NewTail ] = Tail,
   listEinfuegenHelperWithoutPicture(ModifyTree, NewHead, NewTail).
 
-%% Gib das Element zurueck, wohin der Parameter Elem rangehaengt werden soll!
-getParentNode(Tree, Key) ->
-  todo.
-
 %% Funktion generiert ein png Bild von diesen ueber Parameter uebergebenen Baum
 makePicture(Tree, File) when File == nil -> makePicture(Tree, "/Users/foxhound/Desktop/avlBaum/");
 makePicture(Tree, File) ->
@@ -459,28 +526,20 @@ makePicture(Tree, File) ->
   PicNumber = getExecuteNumber(Tree),
   graphviz:to_file(File ++ "Tree" ++ utility:toString(PicNumber) ++ ".png", "png"),
   graphviz:delete().
-
 makePictureHelper(Tree, Head, [], _File, Counter) ->
   CurrentKey = getKey(Head),
-
   ModifyLeftKey = checkOfNil(getLeftChildKey(Tree, CurrentKey), Counter),
   ModifyRightKey = checkOfNil(getRightChildKey(Tree, CurrentKey), Counter + 1),
-
   graphviz:add_edge(utility:toString(CurrentKey), utility:toString(ModifyLeftKey)),
   graphviz:add_edge(utility:toString(CurrentKey), utility:toString(ModifyRightKey));
-
 makePictureHelper(Tree, Head, Tail, File, Counter) ->
   CurrentKey = getKey(Head),
-
   ModifyLeftKey = checkOfNil(getLeftChildKey(Tree, CurrentKey), Counter),
   ModifyRightKey = checkOfNil(getRightChildKey(Tree, CurrentKey), Counter + 1),
-
   graphviz:add_edge(utility:toString(CurrentKey), utility:toString(ModifyLeftKey)),
   graphviz:add_edge(utility:toString(CurrentKey), utility:toString(ModifyRightKey)),
-
   [NewHead | NewTail] = Tail,
   makePictureHelper(Tree, NewHead, NewTail, File, Counter + 2).
-
 
 %% Funktion Prueft ob ein Schluessel im Baum enthalten ist!
 %% Wenn ja dann true, sonst false
@@ -499,11 +558,9 @@ incrementExecution(Tree) ->
   [_Head | Tail] = Tree,
   [lists:nth(1, Tree) + 1] ++ Tail.
 
-
 %=================================================================================================================================================
 %                                                                     SETTER
 %=================================================================================================================================================
-
 %% Funktion aendert das linke Kind
 %% @return Tree
 setLeftChildKey(Tree, Key, Value) ->
@@ -530,11 +587,10 @@ setPredecessor(Tree, Key, Value) ->
   [Part1, Part2 | NodeList] = Tree,
   nodeInserter(NodeList, Key, ModifyNode, [], Part1, Part2).
 
-%% ----------------------------- Funktion tauscht einen Node aus START ----------------------------------------------
+%% Funktion tauscht einen Node aus START
 nodeInserter(NodeList, Key, ModifyNode, ModifyNodeList, Part1, Part2) ->
   [Head | Tail] = NodeList,
   nodeInserterHelper(Head, Tail, Key, ModifyNode, ModifyNodeList, Part1, Part2).
-
 nodeInserterHelper(Head, [], Key, ModifyNode, ModifyNodeList, Part1, Part2) ->
   CurrentKey = getKey(Head),
   if (Key == CurrentKey) ->
@@ -551,52 +607,91 @@ nodeInserterHelper(Head, Tail, Key, ModifyNode, ModifyNodeList, Part1, Part2) ->
     true ->
       nodeInserterHelper(NewHead, RestTail, Key, ModifyNode, ModifyNodeList ++ [Head], Part1, Part2)
   end.
-%% ----------------------------- Funktion tauscht einen Node aus ENDE ----------------------------------------------
-
 
 %=================================================================================================================================================
 %                                                                     GETTER
 %=================================================================================================================================================
+% Gibt die Maximalen Key
+getMaximumKey(Tree, Key) ->
+  getMaximumKeyHelper(Tree, getLeftChildKey(Tree, Key), Key).
+getMaximumKeyHelper(_Tree, Key, Result) when Key == nil -> Result;
+getMaximumKeyHelper(Tree, Key, _Result) ->
+  getMaximumKeyHelper(Tree, getRightChildKey(Tree, Key), Key).
+
+%% Funktion gibt das Kind zum Parent Key das != Key ist
+%% Sowie auf welcher Seite der Key von Parent liegt
+%% 1 -> rechts; 0 -> links
+getSuitablyChildKey(Tree, ParentKey, Key) ->
+  ChildKeyLeft = getLeftChildKey(Tree, ParentKey),
+  ChildKeyRight = getRightChildKey(Tree, ParentKey),
+  if (Key == ChildKeyLeft) ->
+    [ChildKeyRight, 0];
+    true ->
+      [ChildKeyLeft, 1]
+  end.
+
+%% Diese Funktion ermittelt die maximale Tiefe die an den Node Key dran haengt
+%% @param AVL-Baum Tree - AVL Baum auf dem gearbeitet wird
+%% @para Integer Key - Schluessel von dem aus nachgeschaut wird
+%% @result - Der tiefste Punkt als Integer Wert
+getMaxDeep(_Tree, Key) when Key == nil -> 0;
+getMaxDeep(Tree, Key) ->
+  getMaxDeepHelper(Tree, [Key], [getHeight(Tree, Key)]).
+getMaxDeepHelper(_Tree, [], DeepList) -> lists:max(DeepList);
+getMaxDeepHelper(Tree, KeyList, DeepList) ->
+  Key = lists:nth(1, KeyList),
+  LeftKey = getLeftChildKey(Tree, Key),
+  RightKey = getRightChildKey(Tree, Key),
+  ModifyKeyList = lists:delete(Key, KeyList),
+
+  if (LeftKey == nil) ->
+    ModifyKeyList2 = ModifyKeyList,
+    ModifyDeepList = DeepList;
+    true ->
+      ModifyKeyList2 = ModifyKeyList ++ [LeftKey],
+      ModifyDeepList = DeepList ++ [getHeight(Tree, LeftKey)]
+  end,
+
+  if (RightKey == nil) ->
+    ModifyKeyList3 = ModifyKeyList2,
+    ModifyDeepList2 = ModifyDeepList;
+    true ->
+      ModifyKeyList3 = ModifyKeyList2 ++ [RightKey],
+      ModifyDeepList2 = ModifyDeepList ++ [getHeight(Tree, RightKey)]
+  end,
+  getMaxDeepHelper(Tree, ModifyKeyList3, ModifyDeepList2).
 
 %% Gibt den linken Knoten von einem Schluessel
 %% @return Key
-%% ---------------------------------------------------------------------------
 getLeftChildKey(Tree, Key) ->
   Boolean = isAvailable(Tree, Key),
   getLeftChildHelper(Tree, Key, Boolean).
-
-getLeftChildHelper(Tree, Key, Bool) when Bool == false -> io:fwrite("key is not integer"), nil;
-getLeftChildHelper(Tree, Key, Bool) ->
+getLeftChildHelper(_Tree, _Key, Bool) when Bool == false -> io:fwrite("key is not integer"), nil;
+getLeftChildHelper(Tree, Key, _Bool) ->
   Node = getNode(Tree, Key),
   [_Prefix, _NodeKey, [LeftKey, _RightKey], _Height, _KeyTyp] = Node,
   LeftKey.
-%% ---------------------------------------------------------------------------
 
 %% Gibt den rechten Knoten von einem Schluessel
 %% @return Key
-%% ---------------------------------------------------------------------------
 getRightChildKey(Tree, Key) ->
   Boolean = isAvailable(Tree, Key),
   getRightChildHelper(Tree, Key, Boolean).
-
-getRightChildHelper(Tree, Key, Bool) when Bool == false -> io:fwrite("key not found"), nil;
-getRightChildHelper(Tree, Key, Bool) ->
+getRightChildHelper(_Tree, _Key, Bool) when Bool == false -> io:fwrite("key not found"), nil;
+getRightChildHelper(Tree, Key, _Bool) ->
   Node = getNode(Tree, Key),
   [_Prefix, _NodeKey, [_LeftKey, RightKey], _Height, _KeyTyp] = Node,
   RightKey.
-%% ---------------------------------------------------------------------------
 
 %% TODO: Preconditon, falls der Schuessel nicht vorhanden ist
 %% Gibt einen gesamten Knoten zu einen Schluessel
 %% @return Node
-
-getNode(Tree, Key) when is_integer(Key) == false -> nil;
+getNode(_Tree, Key) when is_integer(Key) == false -> nil;
 getNode(Tree, Key) ->
   [_, _ | NodeList] = Tree,
   %%% Pos 2: Der Schluessel/Key
   Buffer = [ X || X <- NodeList, lists:nth(2, X) == Key ],
   lists:nth(1, Buffer).
-
 
 %% Funktion gibt die Wurzel des Bauemes zurueck
 %% @retrun Node
@@ -611,6 +706,7 @@ getRootNode(Tree) ->
       lists:nth(1, Buffer)
   end.
 
+%% Gibt die Hoehe von einen Node zurueck
 getHeight(Tree, Key) ->
   getHeight(getNode(Tree, Key)).
 
@@ -630,9 +726,11 @@ getPredecessor(Tree, Key) ->
 getPredecessor(Node) ->
   lists:nth(5, Node).
 
+%% Gibt die Hoehe eines Nodes zurueck
 getHeight(Node) ->
   lists:nth(4, Node).
 
+%% Gibt die Ausfuehrung Anzahl einer ADT zurueck
 getExecuteNumber(Tree) ->
   lists:nth(1, Tree).
 
